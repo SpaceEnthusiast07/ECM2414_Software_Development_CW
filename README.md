@@ -2,7 +2,7 @@
 # Develop a multi-threaded card playing simulation.
 
 > [!IMPORTANT]
-> Execute `.\run.bat` on Windows or `.\run.sh` on MacOS and Linux from the base project directory to build and run the project.
+> Execute `.\run.bat` on Windows or `./run.sh` on macOS and Linux from the base project directory to build and run the project.
 
 This document contains notes on the implementation of this card playing sim.
 
