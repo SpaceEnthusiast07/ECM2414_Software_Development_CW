@@ -68,6 +68,7 @@ class CardGame {
         sc.close();
 
         // TODO: Create an array of players (threads)
+        cardSim.players = new Player[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
             cardSim.players[i] = new Player(i+1,cardSim);
         }
