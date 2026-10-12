@@ -16,9 +16,10 @@ public class Deck {
 
     /**
      * Adds a new card to the bottom (back) of the deck and simply returns if the deck is full.
+     * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
      * @param newCard The new Card to add to the deck.
      */
-    public void addCard(Card newCard) {
+    public synchronized void addCard(Card newCard) {
         // Check if the deck is full
         if (back == cards.length) {
             return;
@@ -34,9 +35,10 @@ public class Deck {
     /**
      * Removes and returns the card at the top of the deck, and shifts all other cards
      * in the array one space to the left.
+     * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
      * @return The card off the top of the deck.
      */
-    public Card removeCard() {
+    public synchronized Card removeCard() {
         // Check if the deck contains a card to remove
         if (back == 0) {
             return null;
