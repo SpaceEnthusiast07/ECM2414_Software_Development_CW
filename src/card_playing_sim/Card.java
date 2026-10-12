@@ -1,7 +1,7 @@
 package card_playing_sim;
 
 public class Card {
-    // The only card property is its value
+    // Each card has an associated value
     private int value;
 
     /**
@@ -10,5 +10,13 @@ public class Card {
      */
     public Card(int value) {
         this.value = value;
+    }
+
+    /**
+     * Allows the client to retrieve this card's value.
+     * @return This card's value as an Integer.
+     */
+    public int getValue() {
+        return value;
     }
 }
