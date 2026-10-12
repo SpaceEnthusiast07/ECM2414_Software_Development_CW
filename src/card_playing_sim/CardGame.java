@@ -1,7 +1,6 @@
 package card_playing_sim;
 
 // Used to receive the number of players from the user
-import java.io.IOException;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 // Used to read the pack file
@@ -58,6 +57,13 @@ class CardGame {
         System.out.println(packFilePath);
     }
 
+    /**
+     * Reads the data from the provided pack file and validates it based on whether
+     * there are 8n values, each value is a positive integer, and if there are 4 values for each
+     * corresponding player.
+     * @param packFilePath The file path to the pack file to read and validate.
+     * @return Parsed pack file as a Pack object.
+     */
     static Pack readPackFile(String packFilePath) {
         // Create a new File object
         File packFile = new File(packFilePath);
@@ -110,7 +116,7 @@ class CardGame {
             return null;
         }
 
-        // Once we have determined the pack file is valid, return it
+        // Now that the pack file is valid, return it
         return pack;
     }
 }
