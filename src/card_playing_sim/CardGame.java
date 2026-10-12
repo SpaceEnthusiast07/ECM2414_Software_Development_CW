@@ -15,10 +15,17 @@ class CardGame {
     // Holds the path to the pack file
     private String packFilePath;
 
-    private File packFile;
-
     // Holds the pack of cards read from file
     private Pack pack;
+
+    // Holds all the players (threads) of the game
+    private Player[] players;
+
+    // Holds all the decks in the game
+    private Deck[] decks;
+
+    // Flag to keep track of whether a player has won
+    private boolean playerWon;
 
     public static void main(String[] args) {
         // Create a new application instance
@@ -60,6 +67,22 @@ class CardGame {
         // Close the input stream
         sc.close();
 
+        // TODO: Create an array of players (threads)
+        for (int i = 0; i < cardSim.numOfPlayers; i++) {
+            cardSim.players[i] = new Player(i+1,cardSim);
+        }
+
+        // TODO: Use round-robin to distribute cards to players
+
+        // TODO: Create an array of decks
+
+        // TODO: Use round-robin to distribute remaining cards to decks
+
+        // TODO: Assign left and right decks to players
+
+        // TODO: Start all threads (players)
+
+        // FIXME: Test code; must be removed before submission
         System.out.println(cardSim.numOfPlayers);
         System.out.println(cardSim.packFilePath);
     }
@@ -71,15 +94,19 @@ class CardGame {
      * @param packFilePath The file path to the pack file to read and validate.
      * @return Parsed pack file as a Pack object.
      */
-    Pack readPackFile(String packFilePath) {
+    private Pack readPackFile(String packFilePath) {
         // Create a new File object
         File packFile = new File(packFilePath);
+
         // Declare variable to hold card value
         int cardValue;
+
         // Tracks number of cards for each player
         int[] playerCardCountTracker = new int[this.numOfPlayers];
+
         // Keeps track of the number of cards in the pack file
         int numOfCards = 0;
+
         // Initialise a new pack of the required length
         Pack pack = new Pack(this.numOfPlayers);
 
@@ -125,5 +152,27 @@ class CardGame {
 
         // Now that the pack file is valid, return it
         return pack;
+    }
+
+    // TODO: Ensure Javadoc is updated once method functionality is confirmed
+    /**
+     * Informs all others threads that the calling thread has won the game. Synchronization is used
+     * to ensure no other thread can declare that they have won once one thread has.
+     * @param playerValue The value of the player (thread) that has won the game.
+     */
+    public synchronized void stopAllOtherThreads(int playerValue) {
+        // TODO: Sets flag of all other threads to indicate argument thread has won the game
+
+        // Check if another player has already declared it has won the game
+        if (playerWon) {
+            return;
+        }
+
+        // Convert player value to index of thread in array of threads
+        int indexOfWinningThread = playerValue - 1;
+
+        // TODO: Iterate through all other threads and set their "otherThreadWon" flag to "true"
+
+        // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
     }
 }
