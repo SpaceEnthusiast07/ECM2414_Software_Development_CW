@@ -37,7 +37,7 @@ class CardGame {
         // Create a new simulation instance
         CardGame cardSim = new CardGame();
 
-        System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim");
+        System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim\n");
 
         // Used to input numOfPlayers and packFilePath
         Scanner sc = new Scanner(System.in);
@@ -56,8 +56,7 @@ class CardGame {
             // Ignore whitespace and go to next line
             sc.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("ERROR: Number of players must be an Integer greater than 1.");
-            System.exit(1);
+            endProgram("ERROR: Number of players must be an Integer greater than 1.");
         }
 
         // Holds the path to the pack file
@@ -71,8 +70,7 @@ class CardGame {
                 // Read the user's input
                 packFilePath = sc.nextLine();
             } catch (InputMismatchException e) {
-                System.out.println("ERROR: Invalid location of pack file.");
-                System.exit(1);
+                endProgram("ERROR: Invalid location of pack file.");
             }
 
             // Read and validate the provided pack file
@@ -92,9 +90,7 @@ class CardGame {
         try {
             cardSim.distributeCardsToPlayers();
         } catch (InvalidOperationException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Failed to distribute cards to players. Ending program...");
-            return;
+            endProgram(e.getMessage());
         }
 
         // Create an array of decks
@@ -107,9 +103,7 @@ class CardGame {
         try {
             cardSim.distributeCardsToDecks();
         } catch (InvalidOperationException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Failed to distribute cards to decks. Ending program...");
-            return;
+            endProgram(e.getMessage());
         }
 
         // Assign left and right decks to players
@@ -264,5 +258,12 @@ class CardGame {
                 players[i].setRightDeck(decks[i+1]);
             }
         }
+    }
+
+    private static void endProgram(String reason) {
+        System.out.println("\n-----------------\n");
+        System.out.println(reason);
+        System.out.println("\nEnding program...\n");
+        System.exit(1);
     }
 }
