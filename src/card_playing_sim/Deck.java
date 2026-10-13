@@ -4,13 +4,14 @@ public class Deck {
     // Array of cards in deck
     private Card[] cards;
 
+    // Holds the max number of cards in a deck
     private final int MAX_CARDS_IN_DECK = 5;
 
     // Points to the next available space in the deck
     private int back;
 
     /**
-     * Initialises a new deck with a capacity of 5 cards.
+     * Initialises a new deck with a capacity of 5 cards by default.
      */
     public Deck() {
         this.cards = new Card[MAX_CARDS_IN_DECK];
