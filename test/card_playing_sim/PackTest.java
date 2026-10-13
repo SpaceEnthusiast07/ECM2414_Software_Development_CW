@@ -12,7 +12,7 @@ public class PackTest {
         // Create empty pack of fixed-length 3
         Pack myPack = new Pack(3);
 
-        // Add 3 cards of different values (1,3,2)
+        // Create 3 cards of different values (1,3,2)
         Card card1 = new Card(1);
         Card card2 = new Card(3);
         Card card3 = new Card(2);
