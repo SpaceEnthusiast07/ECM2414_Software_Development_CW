@@ -195,10 +195,15 @@ class CardGame {
         // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
     }
 
-    // TODO: Add Javadoc for this method
+    // TODO: Review this method's functionality
+    /**
+     * Uses the round-robin methodology to distribute cards from the pack to each player.
+     * Done before distributing cards to decks.
+     */
     private void distributeCardsToPlayers() {
-        // TODO: Use round-robin to distribute cards to players
+        // Iterate through the number of cards to give to each player
         for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+            // Iterate through each player
             for (int j = 0; j < this.numOfPlayers; j++) {
                 // Take the top card from the pack and give it to this player
                 players[j].giveCard(pack.takeTopCard());
@@ -206,10 +211,15 @@ class CardGame {
         }
     }
 
-    // TODO: Add Javadoc for this method
+    // TODO: Review this method's functionality
+    /**
+     * Uses the round-robin methodology to distribute cards from the pack to each deck.
+     * Done after distributing cards to players.
+     */
     private void distributeCardsToDecks() {
-        // TODO: Use round-robin to distribute cards to decks once distributed to players
+        // Iterate through the number of cards to give to each deck
         for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
+            // Iterate through each deck
             for (int j = 0; j < this.numOfPlayers; j++) {
                 // Take the top card from the pack and give it to this deck
                 decks[j].discardToDeck(pack.takeTopCard());
@@ -218,7 +228,6 @@ class CardGame {
     }
 
     // TODO: Review this method's functionality
-
     /**
      * Assigns each player their corresponding left and right deck. For player i, their left
      * deck is deck i and their right deck is deck i+1.
