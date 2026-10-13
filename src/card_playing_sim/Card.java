@@ -6,7 +6,7 @@ public class Card {
 
     /**
      * Creates a new card by specifying its value.
-     * @param value Regular Integer value of the card.
+     * @param value Positive Integer value of the card.
      */
     public Card(int value) {
         this.value = value;
