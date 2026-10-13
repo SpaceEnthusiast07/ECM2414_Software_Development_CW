@@ -2,7 +2,7 @@ package card_playing_sim;
 
 public class Card {
     // Each card has an associated value
-    private int value;
+    private final int value;
 
     /**
      * Creates a new card by specifying its value.
