@@ -107,7 +107,10 @@ public class Player implements Runnable {
         freeCardIndex++;
     }
 
-    // TODO: Write Javadoc
+    /**
+     * Determines if this player has won the game.
+     * @return True if this player has won the game, false otherwise.
+     */
     private boolean isPlayerWon() {
         boolean isWon = true;
         int cardIndexInHand = 0;
