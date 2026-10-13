@@ -36,7 +36,7 @@ public class Pack {
      */
     public void addCardToBottom(Card newCard) throws InvalidOperationException {
         // Ensure there is enough space to add another card
-        if (bottomOfPack == cards.length) {
+        if (bottomOfPack == cards.length-1) {
             throw new InvalidOperationException("ERROR: Cannot add card to full pack");
         }
 
