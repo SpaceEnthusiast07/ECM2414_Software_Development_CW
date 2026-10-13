@@ -92,11 +92,12 @@ public class Player implements Runnable {
      * Allows the client to manually give this player a card. Used during pack
      * distribution at the start of each game.
      * @param card The new card to give to this player.
+     * @throws InvalidOperation When player already has a full hand.
      */
-    public void giveCard(Card card) {
+    public void giveCard(Card card) throws InvalidOperation {
         // Check if the hand is full
         if (freeCardIndex == hand.length) {
-            return;
+            throw new InvalidOperation("Cannot give card to player with full hand.");
         }
 
         // Add the new card to the hand
@@ -106,6 +107,7 @@ public class Player implements Runnable {
         freeCardIndex++;
     }
 
+    // TODO: Write Javadoc
     private boolean isPlayerWon() {
         boolean isWon = true;
         int cardIndexInHand = 0;
