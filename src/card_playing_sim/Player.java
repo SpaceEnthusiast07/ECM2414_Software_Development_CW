@@ -13,8 +13,8 @@ public class Player implements Runnable {
     // The value of this player, i.e. 1 for player1, 2 for player2, etc
     private final int playerValue;
 
-    // Reference to main program thread so this thread can tell all
-    // other threads to stop once this thread has won
+    // Reference to main program object so this player can tell all
+    // other threads to stop once this player has won
     private final CardGame mainProgram;
 
     // Flag to track whether another player (thread) has won the game
@@ -33,22 +33,26 @@ public class Player implements Runnable {
     private Deck rightDeck;
 
     // Used to know where to place the card when using giveCard()
-    int freeCardIndex;
+    private int freeCardIndex;
 
     /**
      * Initialises a new Player.
      * @param playerValue An Integer value for this player, i.e. 1 for player1, 2 for player2, etc.
-     * @param mainProgram Reference to main program thread, used for game termination.
+     * @param mainProgram Reference to main program object, used for game termination.
      */
     public Player(int playerValue, CardGame mainProgram) {
         this.playerValue = playerValue;
         this.mainProgram = mainProgram;
 
+        // Set flags
+        this.otherPlayerWon = false;
+        this.thisPlayerWon = false;
+
         // Initialise the hand of this player
-        hand = new Card[NUM_CARDS_IN_HAND];
+        this.hand = new Card[NUM_CARDS_IN_HAND];
     }
 
-    // TODO: Check method functionality
+    // TODO: Check run() method's functionality
     /**
      * Main Player logic for taking and discarding cards, and determining if they are a winner, and
      * hence game termination.
@@ -61,47 +65,48 @@ public class Player implements Runnable {
                 // Mark this player as won
                 this.thisPlayerWon = true;
 
-                // TODO: Inform all other players (threads) that this player (thread) has won the game
+                // Inform all other players (threads) that this player (thread) has won the game
                 mainProgram.stopAllOtherThreads(this.playerValue);
 
-                // TODO: Indicate which player has won the game
+                // Indicate that this player has won the game
                 this.winningPlayerValue = this.playerValue;
 
-                // TODO: Update log file to indicate that this thread has won
-                this.logWinningPlayer();
+                // Update log file to indicate that this player has won
+                logWinningPlayer();
             } else {
-                // TODO: Output everything this player does to its own log file
+                // Output everything this player does to its own log file
                 String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
 
                 try (FileWriter fw = new FileWriter(playerLogFileName)) {
                     // Take card from left deck
-                    Card takenCard = leftDeck.takeFromDeck();
+                    Card takenCard = this.leftDeck.takeFromDeck();
 
                     // Write to log file which card this player just took and from which deck
-                    fw.write(String.format("player %d draws a %d from deck %d", this.playerValue, takenCard.getValue(), leftDeck.getDeckValue()));
+                    fw.write(String.format("player %d draws a %d from deck %d", this.playerValue, takenCard.getValue(),
+                            this.leftDeck.getDeckValue()));
 
                     // Choose card to discard
                     int indexOfCardToDiscard = -1;
                     for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                        if (hand[i].getValue() != playerValue) {
+                        if (this.hand[i].getValue() != this.playerValue) {
                             indexOfCardToDiscard = i;
                             break;
                         }
                     }
 
                     // Discard chosen card to right deck
-                    rightDeck.discardToDeck(hand[indexOfCardToDiscard]);
+                    this.rightDeck.discardToDeck(this.hand[indexOfCardToDiscard]);
 
                     // Write to log file which card this player just discarded and to which deck
-                    fw.write(String.format("player %d discards a %d to deck %d", this.playerValue, hand[indexOfCardToDiscard].getValue(), rightDeck.getDeckValue()));
+                    fw.write(String.format("player %d discards a %d to deck %d", this.playerValue, this.hand[indexOfCardToDiscard].getValue(), this.rightDeck.getDeckValue()));
 
                     // Insert taken card into discarded card's location
-                    hand[indexOfCardToDiscard] = takenCard;
+                    this.hand[indexOfCardToDiscard] = takenCard;
 
                     // Write this player's hand to the log file
                     String thisPlayersHand = "";
                     for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                        thisPlayersHand = thisPlayersHand.concat(hand[i].getValue() + " ");
+                        thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
                     }
                     fw.write(String.format("player %d current hand is %s", this.playerValue, thisPlayersHand));
                 } catch (IOException e) {
@@ -117,19 +122,19 @@ public class Player implements Runnable {
      * Allows the client to manually give this player a card. Used during pack
      * distribution at the start of each game.
      * @param card The new card to give to this player.
-     * @throws InvalidOperationException When player already has a full hand.
+     * @throws InvalidOperationException When this player's hand is already full.
      */
     public void giveCard(Card card) throws InvalidOperationException {
         // Check if the hand is full
-        if (freeCardIndex == hand.length) {
-            throw new InvalidOperationException("ERROR: Cannot give card to player with full hand.");
+        if (this.freeCardIndex == this.hand.length) {
+            throw new InvalidOperationException("ERROR: Cannot give a card to a player with a full hand.");
         }
 
         // Add the new card to the hand
-        hand[freeCardIndex] = card;
+        this.hand[this.freeCardIndex] = card;
 
         // Increment the pointer
-        freeCardIndex++;
+        this.freeCardIndex++;
     }
 
     /**
@@ -141,7 +146,7 @@ public class Player implements Runnable {
         int cardIndexInHand = 0;
 
         while (isWon && cardIndexInHand < NUM_CARDS_IN_HAND) {
-            if (hand[cardIndexInHand].getValue() != playerValue) {
+            if (this.hand[cardIndexInHand].getValue() != playerValue) {
                 isWon = false;
             }
             cardIndexInHand++;
@@ -168,19 +173,20 @@ public class Player implements Runnable {
 
     // TODO: Write Javadoc
     private void logWinningPlayer() {
-        // TODO: Set up file writing
+        // Set up file writing
         String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
+
         try (FileWriter fw = new FileWriter(playerLogFileName)) {
-            // TODO: Write which player has won (use string concatenation and winningPlayerValue variable)
+            // Write which player has won to log file
             fw.write(String.format("player %d wins", this.winningPlayerValue));
 
-            // TODO: Log that this player has exited the game; e.g., "player 1 exits"
+            // Log that this player has exited the game; e.g., "player 1 exits"
             fw.write(String.format("player %d exits", this.playerValue));
 
-            // TODO: Log this player's final hand
+            // Log this player's final hand
             String thisPlayersHand = "";
             for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                thisPlayersHand = thisPlayersHand.concat(hand[i].getValue() + " ");
+                thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
             }
             fw.write(String.format("player %d final hand: %s", this.playerValue, thisPlayersHand));
         } catch (IOException e) {
