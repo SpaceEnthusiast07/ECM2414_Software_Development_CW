@@ -70,4 +70,9 @@ public class Deck {
         // Return the removed card
         return removedCard;
     }
+
+    // TODO: Write Javadoc
+    public int getDeckValue() {
+        return this.deckValue;
+    }
 }
