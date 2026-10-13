@@ -31,13 +31,14 @@ public class Pack {
 
     /**
      * Allows the client to add a new card to bottom of the pack.
-     * @param card The new Card to add.
+     * @param newCard The new Card to add.
      */
-    public void addCard(Card card) {
+    public void addCardToBottom(Card newCard) {
         // Ensure there is enough space to add another card
         if (bottomOfPack != cards.length) {
+            // Add this new card
+            this.cards[bottomOfPack] = newCard;
             // Mark new location of bottom of pack
-            this.cards[bottomOfPack] = card;
             bottomOfPack++;
         }
     }
@@ -46,7 +47,7 @@ public class Pack {
      * Allows the client to remove a card from the top of the pack.
      * @return The Card removed from the top of the pack.
      */
-    public Card removeCard() {
+    public Card takeTopCard() {
         // Ensure there are cards to remove
         if (bottomOfPack != topOfPack) {
             // Point top card marker to new top card
