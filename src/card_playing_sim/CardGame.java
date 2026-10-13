@@ -21,8 +21,11 @@ class CardGame {
     // Holds the pack of cards read from file
     private Pack pack;
 
-    // Holds all the players (threads) of the game
+    // Holds all the players of the game
     private Player[] players;
+
+    // Holds all the threads used to run each player on
+    private Thread[] threads;
 
     // Holds all the decks in the game
     private Deck[] decks;
@@ -79,31 +82,37 @@ class CardGame {
         // Close the input stream
         sc.close();
 
-        // TODO: Create an array of players (threads)
+        // Create an array of players
         cardSim.players = new Player[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
             cardSim.players[i] = new Player(i+1,cardSim);
         }
 
-        // TODO: Use round-robin to distribute cards to players
+        // Use round-robin to distribute cards to players
         cardSim.distributeCardsToPlayers();
 
-        // TODO: Create an array of decks
+        // Create an array of decks
         cardSim.decks = new Deck[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
             cardSim.decks[i] = new Deck();
         }
 
-        // TODO: Use round-robin to distribute remaining cards to decks
+        // Use round-robin to distribute remaining cards to decks
         cardSim.distributeCardsToDecks();
 
-        // TODO: Assign left and right decks to players
+        // Assign left and right decks to players
+        cardSim.assignDecksToPlayers();
 
-        // TODO: Start all threads (players)
+        // Create a list of all threads
+        cardSim.threads = new Thread[cardSim.numOfPlayers];
+        for (int i = 0; i < cardSim.numOfPlayers; i++) {
+            cardSim.threads[i] = new Thread(cardSim.players[i]);
+        }
 
-        // FIXME: Test code; must be removed before submission
-        System.out.println(cardSim.numOfPlayers);
-        System.out.println(packFilePath);
+        // Start all threads (players)
+        for (int i = 0; i < cardSim.numOfPlayers; i++) {
+            cardSim.threads[i].start();
+        }
     }
 
     /**
@@ -195,9 +204,8 @@ class CardGame {
         // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
     }
 
-    // TODO: Review this method's functionality
     /**
-     * Uses the round-robin methodology to distribute cards from the pack to each player.
+     * Uses round-robin to distribute cards from the pack to each player.
      * Done before distributing cards to decks.
      */
     private void distributeCardsToPlayers() {
@@ -211,9 +219,8 @@ class CardGame {
         }
     }
 
-    // TODO: Review this method's functionality
     /**
-     * Uses the round-robin methodology to distribute cards from the pack to each deck.
+     * Uses round-robin to distribute cards from the pack to each deck.
      * Done after distributing cards to players.
      */
     private void distributeCardsToDecks() {
@@ -227,7 +234,6 @@ class CardGame {
         }
     }
 
-    // TODO: Review this method's functionality
     /**
      * Assigns each player their corresponding left and right deck. For player i, their left
      * deck is deck i and their right deck is deck i+1.
