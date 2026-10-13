@@ -12,9 +12,6 @@ class CardGame {
     // Represents the number of players, equivalent of n in documentation
     private int numOfPlayers;
 
-    // Holds the path to the pack file
-    private String packFilePath;
-
     // Holds the pack of cards read from file
     private Pack pack;
 
@@ -41,12 +38,21 @@ class CardGame {
             // Ask user for number of players
             System.out.print("Please enter the number of players: ");
             // Read the user's input
-            cardSim.numOfPlayers = sc.nextInt();
+            int input = sc.nextInt();
+            // Ensure there are adequate players
+            if (input < 2) {
+                throw new InputMismatchException();
+            }
+            cardSim.numOfPlayers = input;
+            // Ignore whitespace and go to next line
             sc.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("ERROR: Number of players must be an Integer.");
+            System.out.println("ERROR: Number of players must be an Integer greater than 1.");
             System.exit(1);
         }
+
+        // Holds the path to the pack file
+        String packFilePath = "";
 
         while(cardSim.pack == null) {
             // Input pack file name
@@ -54,14 +60,14 @@ class CardGame {
                 // Ask user for the path to the pack file
                 System.out.print("\nPlease enter location of pack to load: ");
                 // Read the user's input
-                cardSim.packFilePath = sc.nextLine();
+                packFilePath = sc.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("ERROR: Invalid location of pack file.");
                 System.exit(1);
             }
 
             // Read and validate the provided pack file
-            cardSim.pack = cardSim.readPackFile(cardSim.packFilePath);
+            cardSim.pack = cardSim.readPackFile(packFilePath);
         }
 
         // Close the input stream
@@ -90,7 +96,7 @@ class CardGame {
 
         // FIXME: Test code; must be removed before submission
         System.out.println(cardSim.numOfPlayers);
-        System.out.println(cardSim.packFilePath);
+        System.out.println(packFilePath);
     }
 
     /**
