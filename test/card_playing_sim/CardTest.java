@@ -6,8 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class CardTest {
 
     @Test
-    void tempTest() {
-        Card myCard = new Card(5);
-        assertTrue(true);
+    void getCardValue() {
+        int my_number = 5;
+        Card myCard = new Card(my_number);
+        assertEquals(my_number, myCard.getValue());
     }
 }
