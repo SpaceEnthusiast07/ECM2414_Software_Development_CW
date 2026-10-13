@@ -4,12 +4,14 @@ public class Player implements Runnable {
     // Each player has a hand of 4 cards - THREAD CONFINED
     private Card[] hand;
 
+    private final int NUM_CARDS_IN_HAND = 4;
+
     // The value of this player, i.e. 1 for player1, 2 for player2, etc
-    private int playerValue;
+    private final int playerValue;
 
     // Reference to main program thread so this thread can tell all
     // other threads to stop once this thread has won
-    private CardGame mainProgram;
+    private final CardGame mainProgram;
 
     // Flag to track whether another player (thread) has won the game
     private boolean otherPlayerWon;
@@ -36,7 +38,7 @@ public class Player implements Runnable {
         this.mainProgram = mainProgram;
 
         // Initialise the hand of this player
-        hand = new Card[4];
+        hand = new Card[NUM_CARDS_IN_HAND];
     }
 
     /**
@@ -47,8 +49,7 @@ public class Player implements Runnable {
     public void run() {
         while (!otherPlayerWon && !thisPlayerWon) {
             // Check whether this player has won
-            if (hand[0].getValue() == playerValue && hand[1].getValue() == playerValue &&
-                hand[2].getValue() == playerValue && hand[3].getValue() == playerValue) {
+            if (isPlayerWon()) {
                 // Mark this player as won
                 thisPlayerWon = true;
 
@@ -61,11 +62,11 @@ public class Player implements Runnable {
                 // TODO: Note in this log file that this player has won
             } else {
                 // Take card from left deck
-                Card takenCard = leftDeck.removeCard();
+                Card takenCard = leftDeck.takeFromDeck();
 
                 // Choose card to discard
                 int indexOfCardToDiscard = -1;
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
                     if (hand[i].getValue() != playerValue) {
                         indexOfCardToDiscard = i;
                         break;
@@ -73,7 +74,7 @@ public class Player implements Runnable {
                 }
 
                 // Discard chosen card to right deck
-                rightDeck.addCard(hand[indexOfCardToDiscard]);
+                rightDeck.discardToDeck(hand[indexOfCardToDiscard]);
 
                 // Insert taken card into discarded card's location
                 hand[indexOfCardToDiscard] = takenCard;
@@ -103,6 +104,20 @@ public class Player implements Runnable {
 
         // Increment the pointer
         freeCardIndex++;
+    }
+
+    private boolean isPlayerWon() {
+        boolean isWon = true;
+        int cardIndexInHand = 0;
+
+        while (isWon && cardIndexInHand < NUM_CARDS_IN_HAND) {
+            if (hand[cardIndexInHand].getValue() != playerValue) {
+                isWon = false;
+            }
+            cardIndexInHand++;
+        }
+
+        return isWon;
     }
 
     /**
