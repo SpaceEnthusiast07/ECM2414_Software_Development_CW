@@ -26,6 +26,6 @@ public class PlayerTest {
         player.giveCard(card4);
 
         // Give player one too many cards, and check for InvalidOperation error
-        assertThrows(InvalidOperation.class, () -> player.giveCard(card5));
+        assertThrows(InvalidOperationException.class, () -> player.giveCard(card5));
     }
 }

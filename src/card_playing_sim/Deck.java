@@ -25,12 +25,12 @@ public class Deck {
      * Adds a new card to the bottom (back) of the deck and simply returns if the deck is full.
      * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
      * @param newCard The new Card to add to the deck.
-     * @throws InvalidOperation When discarding to a full deck.
+     * @throws InvalidOperationException When discarding to a full deck.
      */
-    public synchronized void discardToDeck(Card newCard) throws InvalidOperation {
+    public synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
         if (back == cards.length) {
-            throw new InvalidOperation("Cannot discard to a full deck.");
+            throw new InvalidOperationException("Cannot discard to a full deck.");
         }
 
         // Add the new card
@@ -45,12 +45,12 @@ public class Deck {
      * in the array one space to the left.
      * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
      * @return The card off the top of the deck.
-     * @throws InvalidOperation When taking from an empty deck.
+     * @throws InvalidOperationException When taking from an empty deck.
      */
-    public synchronized Card takeFromDeck() throws InvalidOperation {
+    public synchronized Card takeFromDeck() throws InvalidOperationException {
         // Check if the deck contains a card to remove
         if (back == 0) {
-            throw new InvalidOperation("Cannot take from an empty deck.");
+            throw new InvalidOperationException("Cannot take from an empty deck.");
         }
 
         // Store the reference to the card to remove
