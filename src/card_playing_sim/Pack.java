@@ -4,7 +4,7 @@ public class Pack {
     private Card[] cards;
     // Marks the location (index) of the top most card
     private int topOfPack;
-    // Marks the location (index) of the bottom most card
+    // Marks the location (index) of the next available space at bottom
     private int bottomOfPack;
 
     /**
@@ -13,6 +13,9 @@ public class Pack {
      */
     public Pack(int numberOfPlayers) {
         this.cards = new Card[8*numberOfPlayers];
+        // Initiate markers
+        this.topOfPack = 0;
+        this.bottomOfPack = 0;
     }
 
     /**
@@ -32,12 +35,10 @@ public class Pack {
      */
     public void addCard(Card card) {
         // Ensure there is enough space to add another card
-        if (bottomOfPack == cards.length-1) {
-            return;
-        } else {
+        if (bottomOfPack != cards.length) {
             // Mark new location of bottom of pack
-            bottomOfPack++;
             this.cards[bottomOfPack] = card;
+            bottomOfPack++;
         }
     }
 
@@ -46,8 +47,12 @@ public class Pack {
      * @return The Card removed from the top of the pack.
      */
     public Card removeCard() {
-        // Point top card marker to new top card
-        topOfPack++;
-        return cards[topOfPack-1];
+        // Ensure there are cards to remove
+        if (bottomOfPack != topOfPack) {
+            // Point top card marker to new top card
+            topOfPack++;
+            return cards[topOfPack - 1];
+        }
+        return null;
     }
 }
