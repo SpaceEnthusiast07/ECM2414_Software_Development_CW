@@ -32,28 +32,35 @@ public class Pack {
     /**
      * Allows the client to add a new card to bottom of the pack.
      * @param newCard The new Card to add.
+     * @throws InvalidOperationException When pack is full
      */
-    public void addCardToBottom(Card newCard) {
+    public void addCardToBottom(Card newCard) throws InvalidOperationException {
         // Ensure there is enough space to add another card
-        if (bottomOfPack != cards.length) {
-            // Add this new card
-            this.cards[bottomOfPack] = newCard;
-            // Mark new location of bottom of pack
-            bottomOfPack++;
+        if (bottomOfPack == cards.length) {
+            throw new InvalidOperationException("ERROR: Cannot add card to full pack");
         }
+
+        // Add this new card
+        this.cards[bottomOfPack] = newCard;
+        // Mark new location of bottom of pack
+        bottomOfPack++;
+
     }
 
     /**
      * Allows the client to remove a card from the top of the pack.
      * @return The Card removed from the top of the pack.
+     * @throws InvalidOperationException When pack is empty
      */
-    public Card takeTopCard() {
-        // Ensure there are cards to remove
-        if (bottomOfPack != topOfPack) {
-            // Point top card marker to new top card
-            topOfPack++;
-            return cards[topOfPack - 1];
+    public Card takeTopCard() throws InvalidOperationException {
+        // Ensure there are cards to take
+        if (bottomOfPack == topOfPack) {
+            throw new InvalidOperationException("ERROR: Cannot take card from empty pack");
         }
-        return null;
+
+        // Point top card marker to new top card
+        topOfPack++;
+        return cards[topOfPack - 1];
+
     }
 }

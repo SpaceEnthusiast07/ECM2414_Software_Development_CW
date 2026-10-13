@@ -89,7 +89,13 @@ class CardGame {
         }
 
         // Use round-robin to distribute cards to players
-        cardSim.distributeCardsToPlayers();
+        try {
+            cardSim.distributeCardsToPlayers();
+        } catch (InvalidOperationException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to distribute cards to players. Ending program...");
+            return;
+        }
 
         // Create an array of decks
         cardSim.decks = new Deck[cardSim.numOfPlayers];
@@ -98,7 +104,13 @@ class CardGame {
         }
 
         // Use round-robin to distribute remaining cards to decks
-        cardSim.distributeCardsToDecks();
+        try {
+            cardSim.distributeCardsToDecks();
+        } catch (InvalidOperationException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Failed to distribute cards to decks. Ending program...");
+            return;
+        }
 
         // Assign left and right decks to players
         cardSim.assignDecksToPlayers();
@@ -144,8 +156,7 @@ class CardGame {
                 cardValue = sc.nextInt();
                 // Ensure card value is positive
                 if (cardValue < 1) {
-                    System.out.println("ERROR: Pack file must only contain positive card values.");
-                    return null;
+                    throw new InvalidPackFileException("ERROR: Pack file must only contain positive card values.");
                 }
                 // If within range of number of players, update card tracker
                 if (cardValue <= this.numOfPlayers) {
@@ -159,15 +170,13 @@ class CardGame {
 
             // Ensure there are 8n cards
             if (numOfCards != 8*this.numOfPlayers) {
-                System.out.println("ERROR: Pack file must contain exactly 8n cards.");
-                return null;
+                throw new InvalidPackFileException("ERROR: Pack file must contain exactly 8n cards.");
             }
 
             // Ensure there are at least 4 cards of each player's index
             for (int i = 0; i < playerCardCountTracker.length; i++) {
                 if (playerCardCountTracker[i] < 4) {
-                    System.out.println("ERROR: Pack file must contain at least 4 cards for each player.");
-                    return null;
+                    throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 cards for each player.");
                 }
             }
         } catch (FileNotFoundException e) {
@@ -175,6 +184,9 @@ class CardGame {
             return null;
         } catch (InputMismatchException e) {
             System.out.println("ERROR: At least 1 card value in the provided pack is not an Integer.");
+            return null;
+        } catch (InvalidPackFileException e) {
+            System.out.println(e.getMessage());
             return null;
         }
 
@@ -210,7 +222,7 @@ class CardGame {
      * Uses round-robin to distribute cards from the pack to each player.
      * Done before distributing cards to decks.
      */
-    private void distributeCardsToPlayers() {
+    private void distributeCardsToPlayers() throws InvalidOperationException {
         // Iterate through the number of cards to give to each player
         for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
             // Iterate through each player
@@ -225,7 +237,7 @@ class CardGame {
      * Uses round-robin to distribute cards from the pack to each deck.
      * Done after distributing cards to players.
      */
-    private void distributeCardsToDecks() {
+    private void distributeCardsToDecks() throws InvalidOperationException {
         // Iterate through the number of cards to give to each deck
         for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
             // Iterate through each deck

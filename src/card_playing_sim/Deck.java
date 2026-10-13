@@ -30,7 +30,7 @@ public class Deck {
     public synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
         if (back == cards.length) {
-            throw new InvalidOperationException("Cannot discard to a full deck.");
+            throw new InvalidOperationException("ERROR: Cannot discard to a full deck.");
         }
 
         // Add the new card
@@ -50,7 +50,7 @@ public class Deck {
     public synchronized Card takeFromDeck() throws InvalidOperationException {
         // Check if the deck contains a card to remove
         if (back == 0) {
-            throw new InvalidOperationException("Cannot take from an empty deck.");
+            throw new InvalidOperationException("ERROR: Cannot take from an empty deck.");
         }
 
         // Store the reference to the card to remove

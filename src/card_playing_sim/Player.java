@@ -106,6 +106,8 @@ public class Player implements Runnable {
                     fw.write(String.format("player %d current hand is %s", this.playerValue, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n", playerLogFileName, this.winningPlayerValue);
+                } catch (InvalidOperationException e) {
+                    System.out.println(e.getMessage());
                 }
             }
         }
@@ -120,7 +122,7 @@ public class Player implements Runnable {
     public void giveCard(Card card) throws InvalidOperationException {
         // Check if the hand is full
         if (freeCardIndex == hand.length) {
-            throw new InvalidOperationException("Cannot give card to player with full hand.");
+            throw new InvalidOperationException("ERROR: Cannot give card to player with full hand.");
         }
 
         // Add the new card to the hand
