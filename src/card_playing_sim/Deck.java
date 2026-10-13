@@ -71,7 +71,10 @@ public class Deck {
         return removedCard;
     }
 
-    // TODO: Write Javadoc
+    /**
+     * Allows the client to retrieve this deck's value.
+     * @return This deck's value as an Integer.
+     */
     public int getDeckValue() {
         return this.deckValue;
     }
