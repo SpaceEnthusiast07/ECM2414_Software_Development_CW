@@ -28,7 +28,7 @@ class CardGame {
     private boolean playerWon;
 
     public static void main(String[] args) {
-        // Create a new application instance
+        // Create a new simulation instance
         CardGame cardSim = new CardGame();
 
         System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim");
@@ -74,8 +74,13 @@ class CardGame {
         }
 
         // TODO: Use round-robin to distribute cards to players
+        cardSim.distributeCardsToPlayers();
 
         // TODO: Create an array of decks
+        cardSim.decks = new Deck[cardSim.numOfPlayers];
+        for (int i = 0; i < cardSim.numOfPlayers; i++) {
+            cardSim.decks[i] = new Deck();
+        }
 
         // TODO: Use round-robin to distribute remaining cards to decks
 
@@ -175,5 +180,10 @@ class CardGame {
         // TODO: Iterate through all other threads and set their "otherThreadWon" flag to "true"
 
         // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
+    }
+
+    // TODO: Add Javadoc for this method
+    private void distributeCardsToPlayers() {
+        // TODO: Use round-robin to distribute cards to players
     }
 }
