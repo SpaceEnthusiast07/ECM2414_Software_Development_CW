@@ -1,10 +1,12 @@
 package card_playing_sim;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PackTest {
 
+    @DisplayName("TEST: adding and taking from pack")
     @Test
     void packAddAndTake() {
         // Create empty pack of fixed-length 3
