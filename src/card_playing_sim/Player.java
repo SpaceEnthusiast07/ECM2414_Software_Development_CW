@@ -78,6 +78,8 @@ public class Player implements Runnable {
                 // Insert taken card into discarded card's location
                 hand[indexOfCardToDiscard] = takenCard;
             }
+
+            // TODO: Output everything this player does to its own log file
         }
 
         // TODO: If other player has won, output this player's stats into its log file
