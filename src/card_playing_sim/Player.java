@@ -1,9 +1,13 @@
 package card_playing_sim;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Player implements Runnable {
     // Each player has a hand of 4 cards - THREAD CONFINED
     private Card[] hand;
 
+    // Holds the number of cards in a player's hand
     private final int NUM_CARDS_IN_HAND = 4;
 
     // The value of this player, i.e. 1 for player1, 2 for player2, etc
@@ -18,6 +22,9 @@ public class Player implements Runnable {
 
     // Flag to track whether this player (thread) has won the game
     private boolean thisPlayerWon;
+
+    // Holds the winning player's value
+    private int winningPlayerValue;
 
     // Cards are taken from the left deck
     private Deck leftDeck;
@@ -41,6 +48,7 @@ public class Player implements Runnable {
         hand = new Card[NUM_CARDS_IN_HAND];
     }
 
+    // TODO: Check method functionality
     /**
      * Main Player logic for taking and discarding cards, and determining if they are a winner, and
      * hence game termination.
@@ -51,41 +59,56 @@ public class Player implements Runnable {
             // Check whether this player has won
             if (isPlayerWon()) {
                 // Mark this player as won
-                thisPlayerWon = true;
+                this.thisPlayerWon = true;
 
                 // TODO: Inform all other players (threads) that this player (thread) has won the game
+                mainProgram.stopAllOtherThreads(this.playerValue);
 
-                // TODO: Output to the terminal that this player has won
+                // TODO: Indicate which player has won the game
+                this.winningPlayerValue = this.playerValue;
 
-                // TODO: Write this players hand to its corresponding log file
-
-                // TODO: Note in this log file that this player has won
+                // TODO: Update log file to indicate that this thread has won
+                this.logWinningPlayer();
             } else {
-                // Take card from left deck
-                Card takenCard = leftDeck.takeFromDeck();
+                // TODO: Output everything this player does to its own log file
+                String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
 
-                // Choose card to discard
-                int indexOfCardToDiscard = -1;
-                for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                    if (hand[i].getValue() != playerValue) {
-                        indexOfCardToDiscard = i;
-                        break;
+                try (FileWriter fw = new FileWriter(playerLogFileName)) {
+                    // Take card from left deck
+                    Card takenCard = leftDeck.takeFromDeck();
+
+                    // Write to log file which card this player just took and from which deck
+                    fw.write(String.format("player %d draws a %d from deck %d", this.playerValue, takenCard.getValue(), leftDeck.getDeckValue()));
+
+                    // Choose card to discard
+                    int indexOfCardToDiscard = -1;
+                    for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+                        if (hand[i].getValue() != playerValue) {
+                            indexOfCardToDiscard = i;
+                            break;
+                        }
                     }
+
+                    // Discard chosen card to right deck
+                    rightDeck.discardToDeck(hand[indexOfCardToDiscard]);
+
+                    // Write to log file which card this player just discarded and to which deck
+                    fw.write(String.format("player %d discards a %d to deck %d", this.playerValue, hand[indexOfCardToDiscard].getValue(), rightDeck.getDeckValue()));
+
+                    // Insert taken card into discarded card's location
+                    hand[indexOfCardToDiscard] = takenCard;
+
+                    // Write this player's hand to the log file
+                    String thisPlayersHand = "";
+                    for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+                        thisPlayersHand = thisPlayersHand.concat(hand[i].getValue() + " ");
+                    }
+                    fw.write(String.format("player %d current hand is %s", this.playerValue, thisPlayersHand));
+                } catch (IOException e) {
+                    System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n", playerLogFileName, this.winningPlayerValue);
                 }
-
-                // Discard chosen card to right deck
-                rightDeck.discardToDeck(hand[indexOfCardToDiscard]);
-
-                // Insert taken card into discarded card's location
-                hand[indexOfCardToDiscard] = takenCard;
             }
-
-            // TODO: Output everything this player does to its own log file
         }
-
-        // TODO: If other player has won, output this player's stats into its log file
-
-        // TODO: Note in this log file which player won the game
     }
 
     /**
@@ -139,5 +162,39 @@ public class Player implements Runnable {
      */
     public void setRightDeck(Deck rightDeck) {
         this.rightDeck = rightDeck;
+    }
+
+    // TODO: Write Javadoc
+    private void logWinningPlayer() {
+        // TODO: Set up file writing
+        String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
+        try (FileWriter fw = new FileWriter(playerLogFileName)) {
+            // TODO: Write which player has won (use string concatenation and winningPlayerValue variable)
+            fw.write(String.format("player %d wins", this.winningPlayerValue));
+
+            // TODO: Log that this player has exited the game; e.g., "player 1 exits"
+            fw.write(String.format("player %d exits", this.playerValue));
+
+            // TODO: Log this player's final hand
+            String thisPlayersHand = "";
+            for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+                thisPlayersHand = thisPlayersHand.concat(hand[i].getValue() + " ");
+            }
+            fw.write(String.format("player %d final hand: %s", this.playerValue, thisPlayersHand));
+        } catch (IOException e) {
+            System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n", playerLogFileName, this.winningPlayerValue);
+        }
+    }
+
+    // TODO: Write Javadoc
+    public void acknowledgeOtherPlayerWon(int winningPlayerValue) {
+        // TODO: Update flag to indicate that another player has won
+        this.otherPlayerWon = true;
+
+        // TODO: Set the winning player value
+        this.winningPlayerValue = winningPlayerValue;
+
+        // TODO: Write to log file this player's hand and which player won
+        this.logWinningPlayer();
     }
 }
