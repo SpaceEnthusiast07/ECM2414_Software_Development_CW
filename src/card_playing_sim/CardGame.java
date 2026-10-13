@@ -94,7 +94,7 @@ class CardGame {
         // Create an array of decks
         cardSim.decks = new Deck[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.decks[i] = new Deck();
+            cardSim.decks[i] = new Deck(i+1);
         }
 
         // Use round-robin to distribute remaining cards to decks
@@ -202,6 +202,8 @@ class CardGame {
         // TODO: Iterate through all other threads and set their "otherThreadWon" flag to "true"
 
         // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
+
+        // TODO: Output to the terminal which player has won
     }
 
     /**
