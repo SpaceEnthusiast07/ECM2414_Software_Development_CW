@@ -12,6 +12,12 @@ class CardGame {
     // Represents the number of players, equivalent of n in documentation
     private int numOfPlayers;
 
+    // Stores the number of cards in a player's hand
+    private final int NUM_CARDS_IN_HAND = 4;
+
+    // Stores the number of cards in a player's hand
+    private final int NUM_CARDS_IN_DECK = 4;
+
     // Holds the pack of cards read from file
     private Pack pack;
 
@@ -89,6 +95,7 @@ class CardGame {
         }
 
         // TODO: Use round-robin to distribute remaining cards to decks
+        cardSim.distributeCardsToDecks();
 
         // TODO: Assign left and right decks to players
 
@@ -136,7 +143,7 @@ class CardGame {
                     playerCardCountTracker[cardValue-1]++;
                 }
                 // Add this card to the pack
-                pack.addCard(new Card(cardValue));
+                pack.addCardToBottom(new Card(cardValue));
                 // Increase number of cards tracker
                 numOfCards++;
             }
@@ -191,5 +198,42 @@ class CardGame {
     // TODO: Add Javadoc for this method
     private void distributeCardsToPlayers() {
         // TODO: Use round-robin to distribute cards to players
+        for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+            for (int j = 0; j < this.numOfPlayers; j++) {
+                // Take the top card from the pack and give it to this player
+                players[j].giveCard(pack.takeTopCard());
+            }
+        }
+    }
+
+    // TODO: Add Javadoc for this method
+    private void distributeCardsToDecks() {
+        // TODO: Use round-robin to distribute cards to decks once distributed to players
+        for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
+            for (int j = 0; j < this.numOfPlayers; j++) {
+                // Take the top card from the pack and give it to this deck
+                decks[j].discardToDeck(pack.takeTopCard());
+            }
+        }
+    }
+
+    // TODO: Review this method's functionality
+
+    /**
+     * Assigns each player their corresponding left and right deck. For player i, their left
+     * deck is deck i and their right deck is deck i+1.
+     */
+    private void assignDecksToPlayers() {
+        // Iterate through each player
+        for (int i = 0; i < numOfPlayers; i++) {
+            // Left deck is deck i for player i
+            players[i].setLeftDeck(decks[i]);
+            // Right deck is i+1 for player i
+            if (i+1 == decks.length) {
+                players[i].setRightDeck(decks[0]);
+            } else {
+                players[i].setRightDeck(decks[i+1]);
+            }
+        }
     }
 }
