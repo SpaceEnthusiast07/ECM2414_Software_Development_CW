@@ -114,6 +114,8 @@ class CardGame {
         cardSim.threads = new Thread[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
             cardSim.threads[i] = new Thread(cardSim.players[i]);
+            // Log the current player's initial hand
+            cardSim.players[i].logInitialHand();
         }
 
         // Start all threads (players)
@@ -214,6 +216,11 @@ class CardGame {
 
         // Output to the terminal which player has won
         System.out.printf("player %d wins\n", playerValue);
+
+        // Log the contents of each deck to its corresponding log file
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            this.decks[i].logFinalDeckContents();
+        }
     }
 
     /**
