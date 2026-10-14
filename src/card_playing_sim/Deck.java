@@ -2,6 +2,9 @@ package card_playing_sim;
 
 // TODO: Jake, can you check Deck class Javadoc?
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
  * Holds a fixed amount of {@link Card}s and utilises a queue structure for taking and discarding cards.
  * <br>
@@ -26,12 +29,17 @@ public class Deck {
     // Points to the next AVAILABLE space in the deck
     private int back;
 
+    // Stores this deck's log file name
+    private final String deckLogFileName;
+
     /**
      * Initialises a new deck with a capacity of 5 cards by default.
      */
     public Deck(int deckValue) {
         this.cards = new Card[MAX_CARDS_IN_DECK];
         this.deckValue = deckValue;
+        // Construct this deck's log file name
+        this.deckLogFileName = String.format("card_playing_sim_log_files/deck%d_output.txt", this.deckValue);
     }
 
     /**
@@ -90,5 +98,35 @@ public class Deck {
      */
     public int getDeckValue() {
         return this.deckValue;
+    }
+
+    /**
+     * Converts this deck's contents to a String so it can be written to this deck's log file.
+     * @return The String representation of this deck's contents.
+     */
+    private String convertDeckContentsToString() {
+        String thisDecksContents = "";
+        for (int i = 0; i < MAX_CARDS_IN_DECK; i++) {
+            thisDecksContents = thisDecksContents.concat(this.cards[i].getValue() + " ");
+        }
+        return thisDecksContents;
+    }
+
+    // TODO: Jake, can you check logFinalDeckContents() functionality?
+    /**
+     * Writes this deck's final contents to its log file at the end of the game.
+     */
+    public void logFinalDeckContents() {
+        // Append flag is false, by default, because we want a fresh deck log file each game
+        try (FileWriter fw = new FileWriter(this.deckLogFileName)) {
+            // Convert this deck's contents to a string
+            String deckContents = convertDeckContentsToString();
+
+            // Write this content to the log file
+            fw.write(String.format("deck %d contents: %s", this.deckValue, deckContents));
+        } catch (IOException e) {
+            System.out.printf("ERROR: Failed to write final deck contents to log file \"%s\" for deck%d\n",
+                    this.deckLogFileName, this.deckValue);
+        }
     }
 }
