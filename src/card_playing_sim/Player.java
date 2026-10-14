@@ -32,6 +32,9 @@ public class Player implements Runnable {
     // The value of this player, i.e. 1 for player1, 2 for player2, etc
     private final int playerValue;
 
+    // This player's log file name
+    private final String playerLogFileName;
+
     // Reference to main program object so this player can tell all
     // other threads to stop once this player has won
     private final CardGame mainProgram;
@@ -69,6 +72,9 @@ public class Player implements Runnable {
 
         // Initialise the hand of this player
         this.hand = new Card[NUM_CARDS_IN_HAND];
+
+        // Construct this player's log file name
+        this.playerLogFileName = String.format("card_playing_sim_log_files/player%d_output.txt", this.playerValue);
     }
 
     // TODO: Check run() method's functionality
@@ -94,10 +100,8 @@ public class Player implements Runnable {
                 logWinningPlayer();
             } else {
                 // Output everything this player does to its own log file
-                String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
-
                 // Append flag is true because we want to add more information to the log file rather than overwrite it
-                try (FileWriter fw = new FileWriter(playerLogFileName, true)) {
+                try (FileWriter fw = new FileWriter(this.playerLogFileName, true)) {
                     // Take card from left deck
                     Card takenCard = this.leftDeck.takeFromDeck();
 
@@ -131,7 +135,7 @@ public class Player implements Runnable {
                     fw.write(String.format("player %d current hand is %s\n", this.playerValue, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                            playerLogFileName, this.winningPlayerValue);
+                            this.playerLogFileName, this.winningPlayerValue);
                 } catch (InvalidOperationException e) {
                     System.out.println(e.getMessage());
                 }
@@ -209,11 +213,8 @@ public class Player implements Runnable {
      * Invoked at the start of each game and logs a player's initial hand.
      */
     public void logInitialHand() {
-        // Construct this player's log file name
-        String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
-
         // Append flag is false, by default, because we want the output file to be fresh each time we play the game
-        try (FileWriter fw = new FileWriter(playerLogFileName)) {
+        try (FileWriter fw = new FileWriter(this.playerLogFileName)) {
             // Convert the players hand to a string
             String thisPlayersHand = convertHandToString();
 
@@ -222,7 +223,7 @@ public class Player implements Runnable {
             fw.write(String.format("player %d initial hand: %s\n", this.playerValue, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
-                    playerLogFileName, this.playerValue);
+                    this.playerLogFileName, this.playerValue);
         }
     }
 
@@ -232,11 +233,8 @@ public class Player implements Runnable {
      * player's final hand to this player's log file.
      */
     private void logWinningPlayer() {
-        // Construct this player's log file name
-        String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
-
         // Append flag is true because we want to add more information to the log file rather than overwrite it
-        try (FileWriter fw = new FileWriter(playerLogFileName, true)) {
+        try (FileWriter fw = new FileWriter(this.playerLogFileName, true)) {
             // Write which player has won to log file
             fw.write(String.format("player %d wins\n", this.winningPlayerValue));
 
@@ -250,7 +248,7 @@ public class Player implements Runnable {
             fw.write(String.format("player %d final hand: %s\n", this.playerValue, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                    playerLogFileName, this.winningPlayerValue);
+                    this.playerLogFileName, this.winningPlayerValue);
         }
     }
 
