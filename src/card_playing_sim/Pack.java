@@ -1,13 +1,30 @@
 package card_playing_sim;
 
-// TODO: Write class Javadoc
+// TODO: Pack class finalised, but Jake can you have a check
+
+/**
+ * Provides a structure for storing 8n {@link Card}s and the operations to manipulate them at the start of the
+ * simulation.
+ * <br>
+ *  - Generally a Pack is constructed by passing in the number of players, but a pre-filled array of Cards can also
+ * be supplied.
+ * <br>
+ *  - To add a card, call {@link #addCardToBottom(Card newCard)}, providing the new card to add; an exception is thrown
+ * when the pack is full.
+ * <br>
+ *  - To take a card from the top of the pack, call {@link #takeTopCard()}, which returns the top card, as a Card object.
+ * If the pack doesn't contain any cards, an exception is thrown.
+ * <br>
+ *  - This Pack class is thread-confined, so doesn't implement any thread-safe aspects.
+ */
 public class Pack {
+    // Array of cards in pack
     private Card[] cards;
 
-    // Marks the location (index) of the top most card
+    // Points TO the top most card
     private int topOfPack;
 
-    // Marks the location (index) of the next available space at bottom of the pack
+    // Points to the next AVAILABLE space to place a card in the pack; i.e., bottom of pack
     private int bottomOfPack;
 
     /**
