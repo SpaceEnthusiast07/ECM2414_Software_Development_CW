@@ -264,11 +264,13 @@ class CardGame {
         }
     }
 
-    // TODO: Write Javadoc and comment
+    // TODO: Jake, can you check the Javadoc and my modifications?
+    /**
+     * Called when an exception is thrown and the problem cannot be resolved via normal means.
+     * @param reason A helpful message to inform the user of why the program quit.
+     */
     private static void endProgram(String reason) {
-        System.out.println("\n-----------------\n");
-        System.out.println(reason);
-        System.out.println("\nEnding program...\n");
+        System.out.printf("\n-----------------\n\n%s\nEnding program...\n\n", reason);
         System.exit(1);
     }
 }
