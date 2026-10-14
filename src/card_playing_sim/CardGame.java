@@ -1,12 +1,18 @@
 package card_playing_sim;
 
 // Used for numOfPlayers, packFilePath, and pack file input
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
 // Used to read the pack file
 import java.io.File;
 import java.io.FileNotFoundException;
+
+// Used to create log file directory
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 class CardGame {
     // Represents the number of players, equivalent of n in documentation
@@ -80,6 +86,9 @@ class CardGame {
 
         // Close the input stream
         sc.close();
+
+        // Set up the log file directory
+        cardSim.setUpLogFileDirectory();
 
         // Create an array of players
         cardSim.players = new Player[cardSim.numOfPlayers];
@@ -279,5 +288,25 @@ class CardGame {
     private static void endProgram(String reason) {
         System.out.printf("\n-----------------\n\n%s\nEnding program...\n\n", reason);
         System.exit(1);
+    }
+
+    // TODO: Update Javadoc once functionality is confirmed
+    /**
+     * Creates the directory "card_playing_sim_log_files/" to store the player and deck log files if it doesn't
+     * already exist.
+     */
+    private void setUpLogFileDirectory() {
+        // TODO: May want to delete directory if it already exists for a fresh start
+        try {
+            // Create a path object for the log files
+            Path path = Paths.get("card_playing_sim_log_files/player1_output.txt");
+
+            if (path.getParent() != null) {
+                // Create the log file directory
+                Files.createDirectories(path.getParent());
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR: Cannot create directory for log files.");
+        }
     }
 }
