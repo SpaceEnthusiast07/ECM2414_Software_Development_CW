@@ -24,7 +24,7 @@ public class Deck {
     private final int deckValue;
 
     // Holds the max number of cards in a deck
-    private final int MAX_CARDS_IN_DECK = 5;
+    private final int MAX_CARDS_IN_DECK = 8;
 
     // Points to the next AVAILABLE space in the deck
     private int back;
@@ -50,7 +50,7 @@ public class Deck {
      */
     public synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
-        if (this.back == this.cards.length) {
+        if (this.back == MAX_CARDS_IN_DECK) {
             throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck. - Occurred within %s", Thread.currentThread().getName()));
         }
 
@@ -106,9 +106,14 @@ public class Deck {
      */
     private String convertDeckContentsToString() {
         String thisDecksContents = "";
-        for (int i = 0; i < MAX_CARDS_IN_DECK; i++) {
-            thisDecksContents = thisDecksContents.concat(this.cards[i].getValue() + " ");
+        int indexOfCardToConvert = 0;
+
+        // Only attempt to convert cards that are not null
+        while (indexOfCardToConvert < MAX_CARDS_IN_DECK && this.cards[indexOfCardToConvert] != null) {
+            thisDecksContents = thisDecksContents.concat(this.cards[indexOfCardToConvert].getValue() + " ");
+            indexOfCardToConvert++;
         }
+
         return thisDecksContents;
     }
 
