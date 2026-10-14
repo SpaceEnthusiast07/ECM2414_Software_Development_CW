@@ -43,7 +43,7 @@ public class Deck {
     public synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
         if (this.back == this.cards.length) {
-            throw new InvalidOperationException("ERROR: Cannot discard to a full deck.");
+            throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck. - Occurred within %s", Thread.currentThread().getName()));
         }
 
         // Add the new card
