@@ -96,7 +96,8 @@ public class Player implements Runnable {
                 // Output everything this player does to its own log file
                 String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
 
-                try (FileWriter fw = new FileWriter(playerLogFileName)) {
+                // Append flag is true because we want to add more information to the log file rather than overwrite it
+                try (FileWriter fw = new FileWriter(playerLogFileName, true)) {
                     // Take card from left deck
                     Card takenCard = this.leftDeck.takeFromDeck();
 
@@ -123,11 +124,10 @@ public class Player implements Runnable {
                     // Insert taken card into discarded card's location
                     this.hand[indexOfCardToDiscard] = takenCard;
 
+                    // Convert this player's hand to a string
+                    String thisPlayersHand = convertHandToString();
+
                     // Write this player's hand to the log file
-                    String thisPlayersHand = "";
-                    for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                        thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
-                    }
                     fw.write(String.format("player %d current hand is %s\n", this.playerValue, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
@@ -192,28 +192,61 @@ public class Player implements Runnable {
         this.rightDeck = rightDeck;
     }
 
-    // TODO: Check logWinningPlayer() method's functionality
+    /**
+     * Converts this player's hand to a String so it can be written to this player's log file.
+     * @return This player's hand represented as a String.
+     */
+    private String convertHandToString() {
+        String thisPlayersHand = "";
+        for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
+            thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
+        }
+        return thisPlayersHand;
+    }
+
+    // TODO: Jake, can you check logInitialHand() functionality?
+    /**
+     * Invoked at the start of each game and logs a player's initial hand.
+     */
+    public void logInitialHand() {
+        // Construct this player's log file name
+        String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
+
+        // Append flag is false, by default, because we want the output file to be fresh each time we play the game
+        try (FileWriter fw = new FileWriter(playerLogFileName)) {
+            // Convert the players hand to a string
+            String thisPlayersHand = convertHandToString();
+
+            // FIXME: Spec doesn't include ":" in initial log file output, but does for all other log file outputs!!
+            // Log this player's initial hand to their log file
+            fw.write(String.format("player %d initial hand: %s\n", this.playerValue, thisPlayersHand));
+        } catch (IOException e) {
+            System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
+                    playerLogFileName, this.playerValue);
+        }
+    }
+
+    // TODO: Jake, can you check logWinningPlayer() functionality?
     /**
      * Writes which player won the game, the fact that this player has exited the game, and this
      * player's final hand to this player's log file.
      */
     private void logWinningPlayer() {
-        // Set up file writing
+        // Construct this player's log file name
         String playerLogFileName = String.format("player%d_output.txt", this.playerValue);
 
-        // Append flag is false because we want the output file to be fresh each time we play the game
-        try (FileWriter fw = new FileWriter(playerLogFileName)) {
+        // Append flag is true because we want to add more information to the log file rather than overwrite it
+        try (FileWriter fw = new FileWriter(playerLogFileName, true)) {
             // Write which player has won to log file
             fw.write(String.format("player %d wins\n", this.winningPlayerValue));
 
             // Log that this player has exited the game; e.g., "player 1 exits"
             fw.write(String.format("player %d exits\n", this.playerValue));
 
+            // Convert this player's hand to a string
+            String thisPlayersHand = convertHandToString();
+
             // Log this player's final hand
-            String thisPlayersHand = "";
-            for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
-                thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
-            }
             fw.write(String.format("player %d final hand: %s\n", this.playerValue, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
