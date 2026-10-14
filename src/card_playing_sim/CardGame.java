@@ -122,7 +122,12 @@ class CardGame {
         // Create a list of all threads
         cardSim.threads = new Thread[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.threads[i] = new Thread(cardSim.players[i]);
+            // Construct a descriptive thread name
+            String customThreadName = String.format("player%d-thread", i+1);
+
+            // Create a new Thread
+            cardSim.threads[i] = new Thread(cardSim.players[i], customThreadName);
+
             // Log the current player's initial hand
             cardSim.players[i].logInitialHand();
         }
