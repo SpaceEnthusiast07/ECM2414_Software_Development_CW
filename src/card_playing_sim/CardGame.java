@@ -70,6 +70,7 @@ class CardGame {
                 // Read the user's input
                 packFilePath = sc.nextLine();
             } catch (InputMismatchException e) {
+                // FIXME: sc.nextLine() will never throw InputMismatchException
                 endProgram("ERROR: Invalid location of pack file.");
             }
 
@@ -188,28 +189,31 @@ class CardGame {
         return pack;
     }
 
-    // TODO: Ensure Javadoc is updated once method functionality is confirmed
+    // TODO: Jake, can you check functionality and Javadoc?
     /**
-     * Informs all others threads that the calling thread has won the game. Synchronization is used
-     * to ensure no other thread can declare that they have won once one thread has.
-     * @param playerValue The value of the player (thread) that has won the game.
+     * Informs all others players that the calling player has won the game. Synchronization is used
+     * to ensure no other thread can declare that they have won once one player has.
+     * @param playerValue The value of the player that has won the game.
      */
     public synchronized void stopAllOtherThreads(int playerValue) {
-        // TODO: Sets flag of all other threads to indicate argument thread has won the game
-
         // Check if another player has already declared it has won the game
         if (playerWon) {
             return;
         }
 
-        // Convert player value to index of thread in array of threads
-        int indexOfWinningThread = playerValue - 1;
+        // Convert playerValue to index of player in array of players
+        int indexOfWinningPlayer = playerValue - 1;
 
-        // TODO: Iterate through all other threads and set their "otherThreadWon" flag to "true"
+        // Inform all other players that this player has won
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            // Skip the calling player
+            if (i != indexOfWinningPlayer) {
+                this.players[i].acknowledgeOtherPlayerWon(playerValue);
+            }
+        }
 
-        // TODO: Also, tell all threads which player won; i.e., pass in the winning player's value
-
-        // TODO: Output to the terminal which player has won
+        // Output to the terminal which player has won
+        System.out.printf("player %d wins\n", playerValue);
     }
 
     /**
@@ -260,6 +264,7 @@ class CardGame {
         }
     }
 
+    // TODO: Write Javadoc and comment
     private static void endProgram(String reason) {
         System.out.println("\n-----------------\n");
         System.out.println(reason);
