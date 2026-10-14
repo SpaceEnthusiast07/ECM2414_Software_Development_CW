@@ -1,12 +1,21 @@
 package card_playing_sim;
 
+/**
+ * Represents a card in this simulation; a card has only one property: a value that is a positive integer.
+ * <br>
+ *  - A new card is created by specifying a positive integer value to the constructor.
+ * <br>
+ *  - The value of a card is a constant; hence, cannot be changed.
+ * <br>
+ *  - To retrieve a card's value, call {@link #getValue()}.
+ */
 public class Card {
     // Each card has an associated value
     private final int value;
 
     /**
      * Creates a new card by specifying its value.
-     * @param value Positive Integer value of the card.
+     * @param value A positive Integer value of the card.
      */
     public Card(int value) {
         this.value = value;
@@ -17,6 +26,6 @@ public class Card {
      * @return This card's value as an Integer.
      */
     public int getValue() {
-        return value;
+        return this.value;
     }
 }
