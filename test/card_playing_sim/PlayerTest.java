@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
 
-    @DisplayName("TEST: overfilling a player's hand")
+    @DisplayName("TEST: Overfilling a player's hand")
     @Test
     void overfillPlayerHand() {
         // Create a new player (no mainProgram needed)

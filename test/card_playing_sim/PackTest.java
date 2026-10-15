@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PackTest {
 
-    @DisplayName("TEST: adding and taking from pack")
+    @DisplayName("TEST: Adding and taking from pack")
     @Test
     void packAddAndTake() {
         // Create empty pack of fixed-length 3
@@ -29,7 +29,7 @@ public class PackTest {
         assertEquals(card1.getValue(), myPack.takeTopCard().getValue());
     }
 
-    @DisplayName("TEST: taking from an empty pack")
+    @DisplayName("TEST: Taking from an empty pack")
     @Test
     void takeFromEmptyPack() {
         // Create an empty pack
@@ -39,7 +39,7 @@ public class PackTest {
         assertThrows(InvalidOperationException.class, () -> emptyPack.takeTopCard() );
     }
 
-    @DisplayName("TEST: adding to a full pack")
+    @DisplayName("TEST: Adding to a full pack")
     @Test
     void addToFullPack() {
         // Create 5 cards

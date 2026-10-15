@@ -7,7 +7,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DeckTest {
 
-    @DisplayName("TEST: discarding and taking from deck")
+    @DisplayName("TEST: Get deck value")
+    @Test
+    void getCardValue() {
+        // Create an empty deck
+        int myNumber = 1;
+        Deck myDeck = new Deck(myNumber);
+
+        // Call getter and check returned value is 5
+        assertEquals(myNumber, myDeck.getDeckValue());
+    }
+
+    @DisplayName("TEST: Discarding and taking from deck")
     @Test
     void deckDiscardAndTake() {
         // Create 3 cards of different values (1,3,2)
@@ -33,7 +44,7 @@ public class DeckTest {
         assertEquals(card1.getValue(), myDeck.takeFromDeck().getValue());
     }
 
-    @DisplayName("TEST: taking from an empty deck")
+    @DisplayName("TEST: Taking from an empty deck")
     @Test
     void takeFromEmptyDeck() {
         // Create an empty deck
@@ -43,7 +54,7 @@ public class DeckTest {
         assertThrows(InvalidOperationException.class, () -> emptyDeck.takeFromDeck() );
     }
 
-    @DisplayName("TEST: discarding to a full deck")
+    @DisplayName("TEST: Discarding to a full deck")
     @Test
     void discardToFullDeck() {
         // Create an empty deck
