@@ -22,7 +22,7 @@ class Deck {
     private final int deckValue;
 
     // Holds the max number of cards in a deck
-    private static final int MAX_CARDS_IN_DECK = 2 * CardGame.NUM_CARDS_IN_DECK;
+    private static final int MAX_CARDS_IN_DECK = 1 + CardGame.NUM_CARDS_IN_DECK;
 
     // Points to the next AVAILABLE space in the deck
     private int back;
@@ -56,6 +56,14 @@ class Deck {
     }
 
     /**
+     * Determines if you can discard to this deck.
+     * @return True if deck is NOT full, false otherwise.
+     */
+    public boolean canDiscardToDeck() {
+        return this.back < MAX_CARDS_IN_DECK;
+    }
+
+    /**
      * Removes and returns the card at the top of the deck, and shifts all other cards
      * in the array one space to the left.
      * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
@@ -85,6 +93,14 @@ class Deck {
 
         // Return the removed card
         return removedCard;
+    }
+
+    /**
+     * Determines if you can take a card from the top of this deck.
+     * @return True if deck is NOT empty, false otherwise.
+     */
+    public boolean canTakeFromDeck() {
+        return this.back > 0;
     }
 
     /**
