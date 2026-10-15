@@ -77,10 +77,12 @@ public class Player implements Runnable {
         this.playerLogFileName = String.format("card_playing_sim_log_files/player%d_output.txt", this.playerValue);
     }
 
-    // TODO: Check run() method's functionality
+    // TODO: Jake, can you check run() functionality?
     /**
      * Main Player logic for taking and discarding cards, and determining if they are a winner, and
      * hence game termination.
+     * <br>
+     * During game termination, this player will write to its log file stating which player won, and this player's final hand.
      */
     @Override
     public void run() {
@@ -141,6 +143,9 @@ public class Player implements Runnable {
                 }
             }
         }
+
+        // Write to log file this player's hand and which player won
+        this.logWinningPlayer();
     }
 
     /**
@@ -254,8 +259,7 @@ public class Player implements Runnable {
 
     // TODO: Check acknowledgeOtherPlayerWon() method's functionality
     /**
-     * Updates the corresponding flag and variable when another player wins the game and outputs this
-     * information to this player's log file using {@link #logWinningPlayer()}.
+     * Updates the corresponding flag and variable when another player wins the game.
      * @param winningPlayerValue An Integer representing the value of the winning player.
      */
     public void acknowledgeOtherPlayerWon(int winningPlayerValue) {
@@ -264,8 +268,5 @@ public class Player implements Runnable {
 
         // Set the winning player's value
         this.winningPlayerValue = winningPlayerValue;
-
-        // Write to log file this player's hand and which player won
-        this.logWinningPlayer();
     }
 }
