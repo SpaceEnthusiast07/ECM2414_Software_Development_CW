@@ -231,7 +231,7 @@ public class CardGame {
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
-            this.decks[i].logFinalDeckContents(LOG_FILE_DIRECTORY);
+            this.decks[i].logFinalDeckContents();
         }
 
     }

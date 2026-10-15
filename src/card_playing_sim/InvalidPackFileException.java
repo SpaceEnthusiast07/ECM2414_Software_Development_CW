@@ -5,6 +5,11 @@ package card_playing_sim;
  * negative numbers, noninteger, values, and not enough of each card corresponding to a player's value.
  */
 public class InvalidPackFileException extends RuntimeException {
+
+    /**
+     * Initialises the InvalidPackFileException
+     * @param message A helpful message to inform the user of why the exception occurred
+     */
     public InvalidPackFileException(String message) {
         super(message);
     }
