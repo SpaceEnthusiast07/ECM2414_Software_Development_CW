@@ -1,7 +1,5 @@
 package card_playing_sim;
 
-// TODO: Pack class finalised, but Jake can you have a check
-
 /**
  * Provides a structure for storing 8n {@link Card}s and the operations to manipulate them at the start of the
  * simulation.
@@ -17,7 +15,7 @@ package card_playing_sim;
  * <br>
  *  - This Pack class is thread-confined, so doesn't implement any thread-safe aspects.
  */
-public class Pack {
+class Pack {
     // Array of cards in pack
     private Card[] cards;
 
@@ -31,7 +29,7 @@ public class Pack {
      * Creates a new pack of length 8n, where n = the number of players.
      * @param numberOfPlayers The number of players in the game.
      */
-    public Pack(int numberOfPlayers) {
+    Pack(int numberOfPlayers) {
         this.cards = new Card[8*numberOfPlayers];
         // Initiate pointers
         this.topOfPack = 0;
@@ -42,7 +40,7 @@ public class Pack {
      * Allows the client to create a new pack by providing an array of cards.
      * @param cards The pre-filled array of cards.
      */
-    public Pack(Card[] cards) {
+    Pack(Card[] cards) {
         this.cards = cards;
         // Initiate pointers
         this.topOfPack = 0;
@@ -54,7 +52,7 @@ public class Pack {
      * @param newCard The new Card to add.
      * @throws InvalidOperationException When the pack is full.
      */
-    public void addCardToBottom(Card newCard) throws InvalidOperationException {
+    void addCardToBottom(Card newCard) throws InvalidOperationException {
         // Ensure there is enough space to add another card
         if (this.bottomOfPack == this.cards.length) {
             throw new InvalidOperationException("ERROR: Cannot add a card to a full pack.");
@@ -72,7 +70,7 @@ public class Pack {
      * @return The Card removed from the top of the pack.
      * @throws InvalidOperationException When the pack is empty.
      */
-    public Card takeTopCard() throws InvalidOperationException {
+    Card takeTopCard() throws InvalidOperationException {
         // Ensure there are cards to take
         if (this.bottomOfPack == this.topOfPack) {
             throw new InvalidOperationException("ERROR: Cannot take a card from an empty pack.");

@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-class CardGame {
+public class CardGame {
     // Represents the number of players, equivalent of n in documentation
     private int numOfPlayers;
 
@@ -39,8 +39,8 @@ class CardGame {
     // Holds all the decks in the game
     private Deck[] decks;
 
-    // Flag to keep track of whether a player has won
-    private boolean anyPlayersWon = false;
+    // Flag to keep track of whether a player has won - THREAD CONFINED
+    private static boolean anyPlayersWon = false;
 
     public static void main(String[] args) {
         // Create a new simulation instance
@@ -82,7 +82,7 @@ class CardGame {
         }
 
         // Holds the path to the pack file
-        String packFilePath = "";
+        String packFilePath;
 
         // Input pack file name
         while(cardSim.pack == null) {
@@ -217,38 +217,23 @@ class CardGame {
         return pack;
     }
 
-    // TODO: Jake, can you check functionality and Javadoc?
+    // TODO: update Javadoc with thread changes
     /**
      * Informs all others players that the calling player has won the game. Synchronization is used
      * to ensure no other thread can declare that they have won once one player has.
-     * @param playerValue The value of the player that has won the game.
      */
-    public synchronized void stopAllOtherThreads(int playerValue) {
+    public synchronized void logAllDecksContents() {
         // Check if another player has already declared it has won the game
-        if (this.anyPlayersWon) {
+        if (anyPlayersWon) {
             return;
         }
-
-        // Convert playerValue to index of player in array of players
-        int indexOfWinningPlayer = playerValue - 1;
-
-        // Inform all other players that this player has won
-        for (int i = 0; i < this.numOfPlayers; i++) {
-            // Skip the calling player
-            if (i != indexOfWinningPlayer) {
-                this.players[i].acknowledgeOtherPlayerWon(playerValue);
-            }
-        }
-
-        // Output to the terminal which player has won
-        System.out.printf("player %d wins\n", playerValue);
+        anyPlayersWon = true;
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.decks[i].logFinalDeckContents(LOG_FILE_DIRECTORY);
         }
 
-        this.anyPlayersWon = true;
     }
 
     /**
@@ -299,7 +284,6 @@ class CardGame {
         }
     }
 
-    // TODO: Jake, can you check the Javadoc and my modifications?
     /**
      * Called when an exception is thrown and the problem cannot be resolved via normal means.
      * @param reason A helpful message to inform the user of why the program quit.

@@ -1,12 +1,10 @@
 package card_playing_sim;
 
-// TODO: Jake, can you check Deck class Javadoc?
-
 import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Holds a fixed amount of {@link Card}s and utilises a queue structure for taking and discarding cards.
+ * Holds a fixed amount of {@link Card}s and utilises a queue structure (FIFO) for taking and discarding cards.
  * <br>
  *  - To create a new Deck, simply pass in its value.
  * <br>
@@ -16,7 +14,7 @@ import java.io.IOException;
  * <br>
  *  - To determine this deck's value, call {@link #getDeckValue()}.
  */
-public class Deck {
+class Deck {
     // Array of cards in deck
     private Card[] cards;
 
@@ -24,7 +22,7 @@ public class Deck {
     private final int deckValue;
 
     // Holds the max number of cards in a deck
-    private final int MAX_CARDS_IN_DECK;
+    private static final int MAX_CARDS_IN_DECK = 2 * CardGame.NUM_CARDS_IN_DECK;
 
     // Points to the next AVAILABLE space in the deck
     private int back;
@@ -32,10 +30,8 @@ public class Deck {
     /**
      * Initialises a new deck with a capacity of 5 cards by default.
      */
-    public Deck(int deckValue) {
-        this.MAX_CARDS_IN_DECK = 2 * CardGame.NUM_CARDS_IN_DECK;
-
-        this.cards = new Card[this.MAX_CARDS_IN_DECK];
+    Deck(int deckValue) {
+        this.cards = new Card[MAX_CARDS_IN_DECK];
         this.deckValue = deckValue;
     }
 
@@ -45,7 +41,7 @@ public class Deck {
      * @param newCard The new Card to add to the deck.
      * @throws InvalidOperationException When discarding to a full deck.
      */
-    public synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
+    synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
         if (this.back == MAX_CARDS_IN_DECK) {
             throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck. - Occurred within %s", Thread.currentThread().getName()));
@@ -65,7 +61,7 @@ public class Deck {
      * @return The card off the top of the deck.
      * @throws InvalidOperationException When taking from an empty deck.
      */
-    public synchronized Card takeFromDeck() throws InvalidOperationException {
+    synchronized Card takeFromDeck() throws InvalidOperationException {
         // Check if the deck contains a card to remove
         if (this.back == 0) {
             throw new InvalidOperationException("ERROR: Cannot take from an empty deck.");
@@ -93,7 +89,7 @@ public class Deck {
      * Allows the client to retrieve this deck's value.
      * @return This deck's value as an Integer.
      */
-    public int getDeckValue() {
+    int getDeckValue() {
         return this.deckValue;
     }
 
@@ -114,11 +110,10 @@ public class Deck {
         return thisDecksContents;
     }
 
-    // TODO: Jake, can you check logFinalDeckContents() functionality?
     /**
      * Writes this deck's final contents to its log file at the end of the game.
      */
-    public void logFinalDeckContents(String logFileDirectoryName) {
+    void logFinalDeckContents(String logFileDirectoryName) {
         String logFilePath = String.format("%sdeck%d_output.txt", logFileDirectoryName, this.deckValue);
 
         // Append flag is false, by default, because we want a fresh deck log file each game

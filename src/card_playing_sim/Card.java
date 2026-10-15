@@ -9,7 +9,7 @@ package card_playing_sim;
  * <br>
  *  - To retrieve a card's value, call {@link #getValue()}.
  */
-public class Card {
+class Card {
     // Each card has an associated value
     private final int value;
 
@@ -17,7 +17,7 @@ public class Card {
      * Creates a new card by specifying its value.
      * @param value A positive Integer value of the card.
      */
-    public Card(int value) {
+    Card(int value) {
         this.value = value;
     }
 
@@ -25,7 +25,7 @@ public class Card {
      * Allows the client to retrieve this card's value.
      * @return This card's value as an Integer.
      */
-    public int getValue() {
+    int getValue() {
         return this.value;
     }
 }
