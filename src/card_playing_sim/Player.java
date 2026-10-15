@@ -2,8 +2,8 @@ package card_playing_sim;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Random;
 
-// TODO: update Javadoc with new thread changes
 /**
  * Contains all the logic for a player's game strategy as well as the logging of a player's every move and
  * which player won at the end of the game.
@@ -23,19 +23,19 @@ class Player implements Runnable {
     private Card[] hand;
 
     // The value of this player, i.e. 1 for player1, 2 for player2, etc
-    private final int playerValue;
+    private final int PLAYER_VALUE;
 
     // This player's log file name
-    private final String playerLogFileName;
+    private final String PLAYER_LOG_FILE_NAME;
 
-    // Reference to main program object so this player can tell all
-    // other threads to stop once this player has won
-    private final CardGame mainProgram;
+    // Reference to main program object so this player can ask main program to write
+    // all the deck contents to their corresponding log files
+    private final CardGame MAIN_PROGRAM;
 
-    // Flag to track whether this player (thread) has won the game
+    // Flag to track whether this player has won the game
     private boolean thisPlayerWon;
 
-    // Flag to track whether another player (thread) has won the game
+    // Flag to track whether another player has won the game
     private static volatile boolean otherPlayerWon;
 
     // Holds the winning player's value
@@ -56,8 +56,8 @@ class Player implements Runnable {
      * @param mainProgram Reference to main program object, used for game termination.
      */
     Player(int playerValue, CardGame mainProgram) {
-        this.playerValue = playerValue;
-        this.mainProgram = mainProgram;
+        this.PLAYER_VALUE = playerValue;
+        this.MAIN_PROGRAM = mainProgram;
 
         // Set flags
         otherPlayerWon = false;
@@ -67,14 +67,15 @@ class Player implements Runnable {
         this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];
 
         // Construct this player's log file name
-        this.playerLogFileName = String.format("%splayer%d_output.txt", CardGame.LOG_FILE_DIRECTORY, this.playerValue);
+        this.PLAYER_LOG_FILE_NAME = String.format("%splayer%d_output.txt", CardGame.LOG_FILE_DIRECTORY, this.PLAYER_VALUE);
     }
 
     /**
      * Main Player logic for taking and discarding cards, and determining if they are a winner, and
      * hence game termination.
      * <br>
-     * During game termination, this player will write to its log file stating which player won, and this player's final hand.
+     * During game termination, this player will write to its log file stating which player won,
+     * and this player's final hand.
      */
     @Override
     public void run() {
@@ -85,39 +86,34 @@ class Player implements Runnable {
                 this.thisPlayerWon = true;
 
                 // Indicate to all players that this player has won the game
-                winningPlayerValue = this.playerValue;
+                winningPlayerValue = this.PLAYER_VALUE;
                 otherPlayerWon = true;
 
                 // Output to the terminal which player has won
-                System.out.printf("player %d wins\n", this.playerValue);
+                System.out.printf("player %d wins\n", this.PLAYER_VALUE);
 
-                mainProgram.logAllDecksContents();
-            } else {
+                MAIN_PROGRAM.logAllDecksContents();
+            }
+            // Check whether this player can take and discard a card to its left and right deck respectively
+            else if (this.leftDeck.canTakeFromDeck() && this.rightDeck.canDiscardToDeck()) {
                 // Output everything this player does to its own log file
                 // Append flag is true because we want to add more information to the log file rather than overwrite it
-                try (FileWriter fw = new FileWriter(this.playerLogFileName, true)) {
+                try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
                     // Take card from left deck
                     Card takenCard = this.leftDeck.takeFromDeck();
 
                     // Write to log file which card this player just took and from which deck
-                    fw.write(String.format("player %d draws a %d from deck %d\n", this.playerValue, takenCard.getValue(),
-                            this.leftDeck.getDeckValue()));
+                    fw.write(String.format("player %d draws a %d from deck %d\n", this.PLAYER_VALUE,
+                            takenCard.getValue(), this.leftDeck.getDeckValue()));
 
-                    // TODO: add randomness
                     // Choose card to discard
-                    int indexOfCardToDiscard = -1;
-                    for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
-                        if (this.hand[i].getValue() != this.playerValue) {
-                            indexOfCardToDiscard = i;
-                            break;
-                        }
-                    }
+                    int indexOfCardToDiscard = getRandomDiscardableCardIndex();
 
                     // Discard chosen card to right deck
                     this.rightDeck.discardToDeck(this.hand[indexOfCardToDiscard]);
 
                     // Write to log file which card this player just discarded and to which deck
-                    fw.write(String.format("player %d discards a %d to deck %d\n", this.playerValue,
+                    fw.write(String.format("player %d discards a %d to deck %d\n", this.PLAYER_VALUE,
                            this.hand[indexOfCardToDiscard].getValue(), this.rightDeck.getDeckValue()));
 
                     // Insert taken card into discarded card's location
@@ -127,10 +123,10 @@ class Player implements Runnable {
                     String thisPlayersHand = convertHandToString();
 
                     // Write this player's hand to the log file
-                    fw.write(String.format("player %d current hand is %s\n", this.playerValue, thisPlayersHand));
+                    fw.write(String.format("player %d current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                            this.playerLogFileName, winningPlayerValue);
+                            this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
                 } catch (InvalidOperationException e) {
                     System.out.println(e.getMessage());
                 }
@@ -169,7 +165,7 @@ class Player implements Runnable {
         int cardIndexInHand = 0;
 
         while (isWon && cardIndexInHand < CardGame.NUM_CARDS_IN_HAND) {
-            if (this.hand[cardIndexInHand].getValue() != playerValue) {
+            if (this.hand[cardIndexInHand].getValue() != PLAYER_VALUE) {
                 isWon = false;
             }
             cardIndexInHand++;
@@ -211,16 +207,16 @@ class Player implements Runnable {
      */
     void logInitialHand() {
         // Append flag is false, by default, because we want the output file to be fresh each time we play the game
-        try (FileWriter fw = new FileWriter(this.playerLogFileName)) {
+        try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME)) {
             // Convert the players hand to a string
             String thisPlayersHand = convertHandToString();
 
             // FIXME: Spec doesn't include ":" in initial log file output, but does for all other log file outputs!!
             // Log this player's initial hand to their log file
-            fw.write(String.format("player %d initial hand: %s\n", this.playerValue, thisPlayersHand));
+            fw.write(String.format("player %d initial hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
-                    this.playerLogFileName, this.playerValue);
+                    this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
         }
     }
 
@@ -230,21 +226,51 @@ class Player implements Runnable {
      */
     private void logWinningPlayer() {
         // Append flag is true because we want to add more information to the log file rather than overwrite it
-        try (FileWriter fw = new FileWriter(this.playerLogFileName, true)) {
+        try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
             // Write which player has won to log file
             fw.write(String.format("player %d wins\n", winningPlayerValue));
 
             // Log that this player has exited the game; e.g., "player 1 exits"
-            fw.write(String.format("player %d exits\n", this.playerValue));
+            fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
 
             // Convert this player's hand to a string
             String thisPlayersHand = convertHandToString();
 
             // Log this player's final hand
-            fw.write(String.format("player %d final hand: %s\n", this.playerValue, thisPlayersHand));
+            fw.write(String.format("player %d final hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                    this.playerLogFileName, winningPlayerValue);
+                    this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
         }
+    }
+
+    /**
+     * Randomly chooses a card to discard that is not the value of this player.
+     * @return The randomly chosen card index to discard.
+     */
+    private int getRandomDiscardableCardIndex() {
+        // Create array to hold potential discardable indices
+        int[] potentialDiscardableIndices = new int[CardGame.NUM_CARDS_IN_HAND];
+
+        // Marks next slot to insert potential index into tracker array
+        int nextFreeSlot = 0;
+
+        // Tracks the quantity of potential indices
+        int numOfPotentialIndices = 0;
+
+        // Determine potential card to discard and note index in tracker array
+        for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
+            if (this.hand[i].getValue() != this.PLAYER_VALUE) {
+                potentialDiscardableIndices[nextFreeSlot] = i;
+                nextFreeSlot++;
+                numOfPotentialIndices++;
+            }
+        }
+
+        // Set up random number generator
+        Random rand = new Random();
+
+        // Choose random index to discard
+        return potentialDiscardableIndices[rand.nextInt(0, numOfPotentialIndices)];
     }
 }
