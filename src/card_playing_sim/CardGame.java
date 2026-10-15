@@ -43,26 +43,39 @@ class CardGame {
         // Create a new simulation instance
         CardGame cardSim = new CardGame();
 
-        System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim\n");
+        System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim");
 
         // Used to input numOfPlayers and packFilePath
         Scanner sc = new Scanner(System.in);
 
-        // Input number of players
-        try {
-            // Ask user for number of players
-            System.out.print("Please enter the number of players: ");
-            // Read the user's input
-            int input = sc.nextInt();
-            // Ensure there are adequate players
-            if (input < 2) {
-                throw new InputMismatchException();
+        boolean validNumOfPlayers = false;
+        while (!validNumOfPlayers) {
+            // Input number of players
+            try {
+                // Ask user for number of players
+                System.out.print("\nPlease enter the number of players: ");
+
+                // Read the user's input
+                int input = sc.nextInt();
+
+                // Ensure there are adequate players
+                if (input < 2) {
+                    throw new InputMismatchException();
+                }
+
+                // Set number of players
+                cardSim.numOfPlayers = input;
+
+                // Ignore whitespace and go to next line
+                sc.nextLine();
+
+                // Update flag to indicate a valid number of players has been entered
+                validNumOfPlayers = true;
+            } catch (InputMismatchException e) {
+                System.out.println("ERROR: Number of players must be an Integer greater than 1.");
+                // Clear input stream ready for next input
+                sc.nextLine();
             }
-            cardSim.numOfPlayers = input;
-            // Ignore whitespace and go to next line
-            sc.nextLine();
-        } catch (InputMismatchException e) {
-            endProgram("ERROR: Number of players must be an Integer greater than 1.");
         }
 
         // Holds the path to the pack file
