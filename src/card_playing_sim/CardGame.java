@@ -185,14 +185,19 @@ public class CardGame {
                 if (cardValue <= this.numOfPlayers) {
                     playerCardCountTracker[cardValue-1]++;
                 }
-                // Add this card to the pack
-                pack.addCardToBottom(new Card(cardValue));
                 // Increase number of cards tracker
                 numOfCards++;
+
+                // Ensure there are not more than 8n cards
+                if (numOfCards > 8*this.numOfPlayers) {
+                    throw new InvalidPackFileException("ERROR: Pack file must contain exactly 8n cards.");
+                }
+                // Add this card to the pack
+                pack.addCardToBottom(new Card(cardValue));
             }
 
-            // Ensure there are 8n cards
-            if (numOfCards != 8*this.numOfPlayers) {
+            // Ensure there are not less than 8n cards
+            if (numOfCards < 8*this.numOfPlayers) {
                 throw new InvalidPackFileException("ERROR: Pack file must contain exactly 8n cards.");
             }
 

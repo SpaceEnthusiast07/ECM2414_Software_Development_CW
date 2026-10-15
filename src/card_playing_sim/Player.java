@@ -118,7 +118,7 @@ class Player implements Runnable {
 
                     // Write to log file which card this player just discarded and to which deck
                     fw.write(String.format("player %d discards a %d to deck %d\n", this.playerValue,
-                            this.hand[indexOfCardToDiscard].getValue(), this.rightDeck.getDeckValue()));
+                           this.hand[indexOfCardToDiscard].getValue(), this.rightDeck.getDeckValue()));
 
                     // Insert taken card into discarded card's location
                     this.hand[indexOfCardToDiscard] = takenCard;
