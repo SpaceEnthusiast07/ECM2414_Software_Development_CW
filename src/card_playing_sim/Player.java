@@ -97,9 +97,6 @@ public class Player implements Runnable {
 
                 // Indicate that this player has won the game
                 this.winningPlayerValue = this.playerValue;
-
-                // Update log file to indicate that this player has won
-                logWinningPlayer();
             } else {
                 // Output everything this player does to its own log file
                 // Append flag is true because we want to add more information to the log file rather than overwrite it
