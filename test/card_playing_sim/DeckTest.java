@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DeckTest {
+    private static final int NUM_CARDS_IN_DECK = 4;
 
     @DisplayName("TEST: discarding and taking from deck")
     @Test
@@ -16,7 +17,7 @@ public class DeckTest {
         Card card3 = new Card(5);
 
         // Create an empty deck
-        Deck myDeck = new Deck(1);
+        Deck myDeck = new Deck(1, NUM_CARDS_IN_DECK);
 
         // Discard 2 cards to deck
         myDeck.discardToDeck(card2);
@@ -37,7 +38,7 @@ public class DeckTest {
     @Test
     void takeFromEmptyDeck() {
         // Create an empty deck
-        Deck emptyDeck = new Deck(1);
+        Deck emptyDeck = new Deck(1, NUM_CARDS_IN_DECK);
 
         //Take from empty deck and check if errors InvalidOperationException
         assertThrows(InvalidOperationException.class, () -> emptyDeck.takeFromDeck() );
@@ -47,7 +48,7 @@ public class DeckTest {
     @Test
     void discardToFullDeck() {
         // Create an empty deck
-        Deck myDeck = new Deck(1);
+        Deck myDeck = new Deck(1, NUM_CARDS_IN_DECK);
 
 
         // Create 6 cards (deck has max size 5)

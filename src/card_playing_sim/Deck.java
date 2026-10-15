@@ -24,22 +24,19 @@ public class Deck {
     private final int deckValue;
 
     // Holds the max number of cards in a deck
-    private final int MAX_CARDS_IN_DECK = 8;
+    private final int MAX_CARDS_IN_DECK;
 
     // Points to the next AVAILABLE space in the deck
     private int back;
 
-    // Stores this deck's log file name
-    private final String deckLogFileName;
-
     /**
      * Initialises a new deck with a capacity of 5 cards by default.
      */
-    public Deck(int deckValue) {
-        this.cards = new Card[MAX_CARDS_IN_DECK];
+    public Deck(int deckValue, int NUM_CARDS_IN_DECK) {
+        this.MAX_CARDS_IN_DECK = 2 * NUM_CARDS_IN_DECK;
+
+        this.cards = new Card[this.MAX_CARDS_IN_DECK];
         this.deckValue = deckValue;
-        // Construct this deck's log file name
-        this.deckLogFileName = String.format("card_playing_sim_log_files/deck%d_output.txt", this.deckValue);
     }
 
     /**
@@ -121,9 +118,11 @@ public class Deck {
     /**
      * Writes this deck's final contents to its log file at the end of the game.
      */
-    public void logFinalDeckContents() {
+    public void logFinalDeckContents(String logFileDirectoryName) {
+        String logFilePath = String.format("%sdeck%d_output.txt", logFileDirectoryName, this.deckValue);
+
         // Append flag is false, by default, because we want a fresh deck log file each game
-        try (FileWriter fw = new FileWriter(this.deckLogFileName)) {
+        try (FileWriter fw = new FileWriter(logFilePath)) {
             // Convert this deck's contents to a string
             String deckContents = convertDeckContentsToString();
 
@@ -131,7 +130,7 @@ public class Deck {
             fw.write(String.format("deck %d contents: %s", this.deckValue, deckContents));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write final deck contents to log file \"%s\" for deck%d\n",
-                    this.deckLogFileName, this.deckValue);
+                    logFilePath, this.deckValue);
         }
     }
 }

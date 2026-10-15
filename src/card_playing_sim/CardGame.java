@@ -24,6 +24,9 @@ class CardGame {
     // Stores the number of cards in a player's hand
     private final int NUM_CARDS_IN_DECK = 4;
 
+    // Stores the string directory name of where log files are stored to
+    public final String LOG_FILE_DIRECTORY = "card_playing_sim_log_files/";
+
     // Holds the pack of cards read from file
     private Pack pack;
 
@@ -37,7 +40,7 @@ class CardGame {
     private Deck[] decks;
 
     // Flag to keep track of whether a player has won
-    private boolean playerWon;
+    private boolean anyPlayersWon = false;
 
     public static void main(String[] args) {
         // Create a new simulation instance
@@ -106,7 +109,7 @@ class CardGame {
         // Create an array of players
         cardSim.players = new Player[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.players[i] = new Player(i+1,cardSim);
+            cardSim.players[i] = new Player(i+1, cardSim, cardSim.NUM_CARDS_IN_HAND, cardSim.LOG_FILE_DIRECTORY);
         }
 
         // Use round-robin to distribute cards to players
@@ -119,7 +122,7 @@ class CardGame {
         // Create an array of decks
         cardSim.decks = new Deck[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.decks[i] = new Deck(i+1);
+            cardSim.decks[i] = new Deck(i+1, cardSim.NUM_CARDS_IN_DECK);
         }
 
         // Use round-robin to distribute remaining cards to decks
@@ -226,7 +229,7 @@ class CardGame {
      */
     public synchronized void stopAllOtherThreads(int playerValue) {
         // Check if another player has already declared it has won the game
-        if (playerWon) {
+        if (this.anyPlayersWon) {
             return;
         }
 
@@ -246,8 +249,10 @@ class CardGame {
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
-            this.decks[i].logFinalDeckContents();
+            this.decks[i].logFinalDeckContents(LOG_FILE_DIRECTORY);
         }
+
+        this.anyPlayersWon = true;
     }
 
     /**
@@ -310,14 +315,14 @@ class CardGame {
 
     // TODO: Update Javadoc once functionality is confirmed
     /**
-     * Creates the directory "card_playing_sim_log_files/" to store the player and deck log files if it doesn't
+     * Creates the directory to store the player and deck log files if it doesn't
      * already exist.
      */
     private void setUpLogFileDirectory() {
         // TODO: May want to delete directory if it already exists for a fresh start
         try {
             // Create a path object for the log files
-            Path path = Paths.get("card_playing_sim_log_files/player1_output.txt");
+            Path path = Paths.get(String.format("%splayer1_output.txt", LOG_FILE_DIRECTORY));
 
             if (path.getParent() != null) {
                 // Create the log file directory
