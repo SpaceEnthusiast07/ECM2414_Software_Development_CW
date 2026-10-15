@@ -3,3 +3,5 @@ bin/*
 .idea/*
 
 docs/javadoc/*
+
+card_playing_sim_log_files/*

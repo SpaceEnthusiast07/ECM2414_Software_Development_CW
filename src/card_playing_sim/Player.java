@@ -206,7 +206,6 @@ class Player implements Runnable {
         return thisPlayersHand;
     }
 
-    // TODO: Jake, can you check logInitialHand() functionality?
     /**
      * Invoked at the start of each game and logs a player's initial hand.
      */
@@ -225,7 +224,6 @@ class Player implements Runnable {
         }
     }
 
-    // TODO: Jake, can you check logWinningPlayer() functionality?
     /**
      * Writes which player won the game, the fact that this player has exited the game, and this
      * player's final hand to this player's log file.
