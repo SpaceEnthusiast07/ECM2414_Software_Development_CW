@@ -5,13 +5,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
-    private static final int NUM_CARDS_IN_HAND = 4;
 
     @DisplayName("TEST: overfilling a player's hand")
     @Test
     void overfillPlayerHand() {
         // Create a new player (no mainProgram needed)
-        Player player = new Player(1, null, NUM_CARDS_IN_HAND, "");
+        Player player = new Player(1, null);
 
         // Create 5 cards (1 too many)
         Card card1 = new Card(1);

@@ -32,8 +32,8 @@ public class Deck {
     /**
      * Initialises a new deck with a capacity of 5 cards by default.
      */
-    public Deck(int deckValue, int NUM_CARDS_IN_DECK) {
-        this.MAX_CARDS_IN_DECK = 2 * NUM_CARDS_IN_DECK;
+    public Deck(int deckValue) {
+        this.MAX_CARDS_IN_DECK = 2 * CardGame.NUM_CARDS_IN_DECK;
 
         this.cards = new Card[this.MAX_CARDS_IN_DECK];
         this.deckValue = deckValue;

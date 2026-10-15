@@ -62,7 +62,7 @@ public class Player implements Runnable {
      * @param playerValue An Integer value for this player, i.e. 1 for player1, 2 for player2, etc.
      * @param mainProgram Reference to main program object, used for game termination.
      */
-    public Player(int playerValue, CardGame mainProgram, int NUM_CARDS_IN_HAND, String LOG_FILE_DIRECTORY) {
+    public Player(int playerValue, CardGame mainProgram) {
         this.playerValue = playerValue;
         this.mainProgram = mainProgram;
 
@@ -71,12 +71,12 @@ public class Player implements Runnable {
         this.thisPlayerWon = false;
 
         // Initialise the hand of this player
-        this.hand = new Card[NUM_CARDS_IN_HAND];
+        this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];
 
         // Construct this player's log file name
-        this.playerLogFileName = String.format("%splayer%d_output.txt", LOG_FILE_DIRECTORY, this.playerValue);
+        this.playerLogFileName = String.format("%splayer%d_output.txt", CardGame.LOG_FILE_DIRECTORY, this.playerValue);
 
-        this.NUM_CARDS_IN_HAND = NUM_CARDS_IN_HAND;
+        this.NUM_CARDS_IN_HAND = CardGame.NUM_CARDS_IN_HAND;
     }
 
     // TODO: Jake, can you check run() functionality?

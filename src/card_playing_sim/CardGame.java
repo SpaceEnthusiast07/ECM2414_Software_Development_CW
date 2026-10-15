@@ -19,13 +19,13 @@ class CardGame {
     private int numOfPlayers;
 
     // Stores the number of cards in a player's hand
-    private final int NUM_CARDS_IN_HAND = 4;
+    static final int NUM_CARDS_IN_HAND = 4;
 
     // Stores the number of cards in a player's hand
-    private final int NUM_CARDS_IN_DECK = 4;
+    static final int NUM_CARDS_IN_DECK = 4;
 
     // Stores the string directory name of where log files are stored to
-    public final String LOG_FILE_DIRECTORY = "card_playing_sim_log_files/";
+    static final String LOG_FILE_DIRECTORY = "card_playing_sim_log_files/";
 
     // Holds the pack of cards read from file
     private Pack pack;
@@ -84,17 +84,13 @@ class CardGame {
         // Holds the path to the pack file
         String packFilePath = "";
 
+        // Input pack file name
         while(cardSim.pack == null) {
-            // Input pack file name
-            try {
-                // Ask user for the path to the pack file
-                System.out.print("\nPlease enter location of pack to load: ");
-                // Read the user's input
-                packFilePath = sc.nextLine();
-            } catch (InputMismatchException e) {
-                // FIXME: sc.nextLine() will never throw InputMismatchException
-                endProgram("ERROR: Invalid location of pack file.");
-            }
+            // Ask user for the path to the pack file
+            System.out.print("\nPlease enter location of pack to load: ");
+
+            // Read the user's input
+            packFilePath = sc.nextLine();
 
             // Read and validate the provided pack file
             cardSim.pack = cardSim.readPackFile(packFilePath);
@@ -109,7 +105,7 @@ class CardGame {
         // Create an array of players
         cardSim.players = new Player[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.players[i] = new Player(i+1, cardSim, cardSim.NUM_CARDS_IN_HAND, cardSim.LOG_FILE_DIRECTORY);
+            cardSim.players[i] = new Player(i+1, cardSim);
         }
 
         // Use round-robin to distribute cards to players
@@ -122,7 +118,7 @@ class CardGame {
         // Create an array of decks
         cardSim.decks = new Deck[cardSim.numOfPlayers];
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.decks[i] = new Deck(i+1, cardSim.NUM_CARDS_IN_DECK);
+            cardSim.decks[i] = new Deck(i+1);
         }
 
         // Use round-robin to distribute remaining cards to decks

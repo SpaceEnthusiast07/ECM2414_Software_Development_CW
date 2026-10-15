@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DeckTest {
-    private static final int NUM_CARDS_IN_DECK = 4;
 
     @DisplayName("TEST: discarding and taking from deck")
     @Test
@@ -17,7 +16,7 @@ public class DeckTest {
         Card card3 = new Card(5);
 
         // Create an empty deck
-        Deck myDeck = new Deck(1, NUM_CARDS_IN_DECK);
+        Deck myDeck = new Deck(1);
 
         // Discard 2 cards to deck
         myDeck.discardToDeck(card2);
@@ -38,7 +37,7 @@ public class DeckTest {
     @Test
     void takeFromEmptyDeck() {
         // Create an empty deck
-        Deck emptyDeck = new Deck(1, NUM_CARDS_IN_DECK);
+        Deck emptyDeck = new Deck(1);
 
         //Take from empty deck and check if errors InvalidOperationException
         assertThrows(InvalidOperationException.class, () -> emptyDeck.takeFromDeck() );
@@ -48,25 +47,31 @@ public class DeckTest {
     @Test
     void discardToFullDeck() {
         // Create an empty deck
-        Deck myDeck = new Deck(1, NUM_CARDS_IN_DECK);
+        Deck myDeck = new Deck(1);
 
 
-        // Create 6 cards (deck has max size 5)
+        // Create 9 cards (deck has max size 8)
         Card card1 = new Card(3);
         Card card2 = new Card(2);
         Card card3 = new Card(5);
         Card card4 = new Card(2);
         Card card5 = new Card(1);
         Card card6 = new Card(5);
+        Card card7 = new Card(2);
+        Card card8 = new Card(6);
+        Card card9 = new Card(9);
 
-        // Discard 5 cards to deck
+        // Discard 7 cards to deck
         myDeck.discardToDeck(card1);
         myDeck.discardToDeck(card2);
         myDeck.discardToDeck(card3);
         myDeck.discardToDeck(card4);
         myDeck.discardToDeck(card5);
+        myDeck.discardToDeck(card6);
+        myDeck.discardToDeck(card7);
+        myDeck.discardToDeck(card8);
 
-        //Add 6th card to full deck and check if errors InvalidOperationException
-        assertThrows(InvalidOperationException.class, () -> myDeck.discardToDeck(card6) );
+        //Add 9th card to full deck and check if errors InvalidOperationException
+        assertThrows(InvalidOperationException.class, () -> myDeck.discardToDeck(card9) );
     }
 }
