@@ -65,7 +65,8 @@ class Deck {
     synchronized Card takeFromDeck() throws InvalidOperationException {
         // Check if the deck contains a card to remove
         if (this.back == 0) {
-            throw new InvalidOperationException("ERROR: Cannot take from an empty deck.");
+            // TODO: revert this back to normal err message (and other instance)
+            throw new InvalidOperationException(String.format("ERROR: Cannot take from an empty deck. - %s", Thread.currentThread().getName()));
         }
 
         // Store the reference to the card to remove
