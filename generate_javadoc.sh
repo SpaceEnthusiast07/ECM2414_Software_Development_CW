@@ -8,7 +8,7 @@ set +x
 
 # Compile javadoc with quiet flag unless "-v" arg passed
 if [ "$MODE" = "-v" ]; then
-    javadoc -d ./docs/javadoc/ ./src/card_playing_sim/*
+    javadoc -package -d ./docs/javadoc/ ./src/card_playing_sim/*
 else
-    javadoc -quiet -d ./docs/javadoc/ ./src/card_playing_sim/*
+    javadoc -package -quiet -d ./docs/javadoc/ ./src/card_playing_sim/*
 fi
