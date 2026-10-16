@@ -123,7 +123,7 @@ class Player implements Runnable {
                     String thisPlayersHand = convertHandToString();
 
                     // Write this player's hand to the log file
-                    fw.write(String.format("player %d current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
+                    fw.write(String.format("player %d's current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
                             this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
@@ -211,9 +211,8 @@ class Player implements Runnable {
             // Convert the players hand to a string
             String thisPlayersHand = convertHandToString();
 
-            // FIXME: Spec doesn't include ":" in initial log file output, but does for all other log file outputs!!
             // Log this player's initial hand to their log file
-            fw.write(String.format("player %d initial hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
+            fw.write(String.format("player %d's initial hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
                     this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
@@ -230,14 +229,14 @@ class Player implements Runnable {
             // Write which player has won to log file
             fw.write(String.format("player %d wins\n", winningPlayerValue));
 
-            // Log that this player has exited the game; e.g., "player 1 exits"
+            // Log that this player has exited the game; e.g., "player1 exits"
             fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
 
             // Convert this player's hand to a string
             String thisPlayersHand = convertHandToString();
 
             // Log this player's final hand
-            fw.write(String.format("player %d final hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
+            fw.write(String.format("player %d's final hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
                     this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
