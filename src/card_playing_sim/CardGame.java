@@ -47,68 +47,76 @@ public class CardGame {
         // Create a new simulation instance
         CardGame cardSim = new CardGame();
 
-        System.out.println("=== ECM2414 Software Development Coursework ===\nCard Playing Sim");
+        // Start the sim
+        cardSim.startSim();
+    }
+
+    /**
+     * Sets up and starts a new multithreaded card playing simulation.
+     */
+    public void startSim() {
+        System.out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
 
         // Used to input numOfPlayers and packFilePath
         Scanner sc = new Scanner(System.in);
 
         // Ask the user to input the number of players
-        cardSim.inputNumberOfPlayers(sc);
+        this.inputNumberOfPlayers(sc);
 
         // Ack the user to input the name for the pack file
-        cardSim.inputPackFileName(sc);
+        this.inputPackFileName(sc);
 
         // Close the input stream
         sc.close();
 
         // Set up the log file directory
-        cardSim.setUpLogFileDirectory();
+        this.setUpLogFileDirectory();
 
         // Create an array of players
-        cardSim.players = new Player[cardSim.numOfPlayers];
-        for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.players[i] = new Player(i+1, cardSim);
+        this.players = new Player[this.numOfPlayers];
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            this.players[i] = new Player(i+1, this);
         }
 
         // Use round-robin to distribute cards to players
         try {
-            cardSim.distributeCardsToPlayers();
+            this.distributeCardsToPlayers();
         } catch (InvalidOperationException e) {
             endProgram(e.getMessage());
         }
 
         // Create an array of decks
-        cardSim.decks = new Deck[cardSim.numOfPlayers];
-        for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.decks[i] = new Deck(i+1);
+        this.decks = new Deck[this.numOfPlayers];
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            this.decks[i] = new Deck(i+1);
         }
 
         // Use round-robin to distribute remaining cards to decks
         try {
-            cardSim.distributeCardsToDecks();
+            this.distributeCardsToDecks();
         } catch (InvalidOperationException e) {
             endProgram(e.getMessage());
         }
 
         // Assign left and right decks to players
-        cardSim.assignDecksToPlayers();
+        this.assignDecksToPlayers();
 
         // Create a list of all threads
-        cardSim.threads = new Thread[cardSim.numOfPlayers];
-        for (int i = 0; i < cardSim.numOfPlayers; i++) {
+        this.threads = new Thread[this.numOfPlayers];
+        for (int i = 0; i < this.numOfPlayers; i++) {
             // Construct a descriptive thread name
             String customThreadName = String.format("player%d-thread", i+1);
 
             // Create a new Thread
-            cardSim.threads[i] = new Thread(cardSim.players[i], customThreadName);
+            this.threads[i] = new Thread(this.players[i], customThreadName);
 
             // Log the current player's initial hand
-            cardSim.players[i].logInitialHand();
+            this.players[i].logInitialHand();
         }
 
         // Start all threads (players)
-        for (int i = 0; i < cardSim.numOfPlayers; i++) {
-            cardSim.threads[i].start();
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            this.threads[i].start();
         }
     }
 
