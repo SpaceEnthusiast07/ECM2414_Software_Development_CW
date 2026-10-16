@@ -251,10 +251,9 @@ public class CardGame {
         return pack;
     }
 
-    // TODO: update Javadoc with thread changes
     /**
-     * Informs all others players that the calling player has won the game. Synchronization is used
-     * to ensure no other thread can declare that they have won once one player has.
+     * Logs each deck's contents to their corresponding log file once a player has declared they have won. Synchronization is used
+     * to ensure no other thread can log deck contents at the same time as another thread.
      */
     public synchronized void logAllDecksContents() {
         // Check if another player has already declared it has won the game
@@ -327,13 +326,11 @@ public class CardGame {
         System.exit(1);
     }
 
-    // TODO: Update Javadoc once functionality is confirmed
     /**
      * Creates the directory to store the player and deck log files if it doesn't
      * already exist.
      */
     private void setUpLogFileDirectory() {
-        // TODO: May want to delete directory if it already exists for a fresh start
         try {
             // Create a path object for the log files
             Path path = Paths.get(String.format("%splayer1_output.txt", LOG_FILE_DIRECTORY));
