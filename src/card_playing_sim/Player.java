@@ -104,7 +104,7 @@ class Player implements Runnable {
 
                     // Write to log file which card this player just took and from which deck
                     fw.write(String.format("player %d draws a %d from deck %d\n", this.PLAYER_VALUE,
-                            takenCard.getValue(), this.leftDeck.getDeckValue()));
+                            takenCard.value(), this.leftDeck.getDeckValue()));
 
                     // Choose card to discard
                     int indexOfCardToDiscard = getRandomDiscardableCardIndex();
@@ -114,7 +114,7 @@ class Player implements Runnable {
 
                     // Write to log file which card this player just discarded and to which deck
                     fw.write(String.format("player %d discards a %d to deck %d\n", this.PLAYER_VALUE,
-                           this.hand[indexOfCardToDiscard].getValue(), this.rightDeck.getDeckValue()));
+                           this.hand[indexOfCardToDiscard].value(), this.rightDeck.getDeckValue()));
 
                     // Insert taken card into discarded card's location
                     this.hand[indexOfCardToDiscard] = takenCard;
@@ -165,7 +165,7 @@ class Player implements Runnable {
         int cardIndexInHand = 0;
 
         while (isWon && cardIndexInHand < CardGame.NUM_CARDS_IN_HAND) {
-            if (this.hand[cardIndexInHand].getValue() != PLAYER_VALUE) {
+            if (this.hand[cardIndexInHand].value() != PLAYER_VALUE) {
                 isWon = false;
             }
             cardIndexInHand++;
@@ -197,7 +197,7 @@ class Player implements Runnable {
     private String convertHandToString() {
         String thisPlayersHand = "";
         for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
-            thisPlayersHand = thisPlayersHand.concat(this.hand[i].getValue() + " ");
+            thisPlayersHand = thisPlayersHand.concat(this.hand[i].value() + " ");
         }
         return thisPlayersHand;
     }
@@ -259,7 +259,7 @@ class Player implements Runnable {
 
         // Determine potential card to discard and note index in tracker array
         for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
-            if (this.hand[i].getValue() != this.PLAYER_VALUE) {
+            if (this.hand[i].value() != this.PLAYER_VALUE) {
                 potentialDiscardableIndices[nextFreeSlot] = i;
                 nextFreeSlot++;
                 numOfPotentialIndices++;

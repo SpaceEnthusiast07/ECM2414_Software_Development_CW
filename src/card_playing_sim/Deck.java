@@ -120,7 +120,7 @@ class Deck {
 
         // Only attempt to convert cards that are not null
         while (indexOfCardToConvert < MAX_CARDS_IN_DECK && this.cards[indexOfCardToConvert] != null) {
-            thisDecksContents = thisDecksContents.concat(this.cards[indexOfCardToConvert].getValue() + " ");
+            thisDecksContents = thisDecksContents.concat(this.cards[indexOfCardToConvert].value() + " ");
             indexOfCardToConvert++;
         }
 
