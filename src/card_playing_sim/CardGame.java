@@ -6,10 +6,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
-// Used to read the pack file
-import java.io.File;
-import java.io.FileNotFoundException;
-
 // Used to create log file directory
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,7 +59,7 @@ public class CardGame {
         // Ask the user to input the number of players
         this.inputNumberOfPlayers(sc);
 
-        // Ack the user to input the name for the pack file
+        // Ack the user to input the name for the pack file and validates it
         this.inputPackFileName(sc);
 
         // Close the input stream
@@ -178,85 +174,8 @@ public class CardGame {
             packFilePath = sc.nextLine();
 
             // Read and validate the provided pack file
-            this.pack = this.readPackFile(packFilePath);
+            this.pack = Pack.readPackFile(packFilePath, this.numOfPlayers);
         }
-    }
-
-    /**
-     * Reads the data from the provided pack file and validates it based on whether
-     * there are 8n values, each value is a positive integer, and if there are 4 values for each
-     * corresponding player.
-     * @param packFilePath The file path to the pack file to read and validate.
-     * @return Parsed pack file as a Pack object.
-     */
-    private Pack readPackFile(String packFilePath) {
-        // Create a new File object
-        File packFile = new File(packFilePath);
-
-        // Declare variable to hold card value
-        int cardValue;
-
-        // Tracks number of cards for each player
-        int[] playerCardCountTracker = new int[this.numOfPlayers];
-
-        // Keeps track of the number of cards in the pack file
-        int numOfCards = 0;
-
-        // Initialise a new pack of the required length
-        Pack pack = new Pack(this.numOfPlayers);
-
-        try (Scanner sc = new Scanner(packFile)) {
-            // Loop through each line in the pack file
-            while (sc.hasNextLine()) {
-                cardValue = sc.nextInt();
-                // Ensure card value is positive
-                if (cardValue < 1) {
-                    throw new InvalidPackFileException("ERROR: Pack file must only contain positive card values.");
-                }
-                // If within range of number of players, update card tracker
-                if (cardValue <= this.numOfPlayers) {
-                    playerCardCountTracker[cardValue-1]++;
-                }
-                // Increase number of cards tracker
-                numOfCards++;
-
-                // Ensure there are no more than 8n cards
-                if (numOfCards > 8*this.numOfPlayers) {
-                    throw new InvalidPackFileException("ERROR: Pack file contains too many cards, " +
-                            "must contain exactly 8n cards.");
-                }
-                // Add this card to the pack
-                pack.addCardToBottom(new Card(cardValue));
-            }
-
-            // Ensure there are not less than 8n cards
-            if (numOfCards < 8*this.numOfPlayers) {
-                throw new InvalidPackFileException("ERROR: Pack file is too short, must contain exactly 8n cards.");
-            }
-
-            // Ensure there are at least 4 cards of each player's preference
-            for (int i = 0; i < playerCardCountTracker.length; i++) {
-                if (playerCardCountTracker[i] < 4) {
-                    throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 of each " +
-                            "player's preferred card.");
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("ERROR: Pack file does not exist.");
-            return null;
-        } catch (InputMismatchException e) {
-            System.out.println("ERROR: At least 1 card value in the provided pack is not an Integer.");
-            return null;
-        } catch (InvalidPackFileException e) {
-            System.out.println(e.getMessage());
-            return null;
-        } catch (NoSuchElementException e) {
-            System.out.println("ERROR: Pack file is empty, must contain exactly 8n cards.");
-            return null;
-        }
-
-        // Now that the pack file is valid, return it
-        return pack;
     }
 
     /**
