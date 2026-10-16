@@ -52,50 +52,11 @@ public class CardGame {
         // Used to input numOfPlayers and packFilePath
         Scanner sc = new Scanner(System.in);
 
-        boolean validNumOfPlayers = false;
-        while (!validNumOfPlayers) {
-            // Input number of players
-            try {
-                // Ask user for number of players
-                System.out.print("\nPlease enter the number of players: ");
+        // Ask the user to input the number of players
+        cardSim.inputNumberOfPlayers(sc);
 
-                // Read the user's input
-                int input = sc.nextInt();
-
-                // Ensure there are adequate players
-                if (input < 2) {
-                    throw new InputMismatchException();
-                }
-
-                // Set number of players
-                cardSim.numOfPlayers = input;
-
-                // Ignore whitespace and go to next line
-                sc.nextLine();
-
-                // Update flag to indicate a valid number of players has been entered
-                validNumOfPlayers = true;
-            } catch (InputMismatchException e) {
-                System.out.println("ERROR: Number of players must be an Integer greater than 1.");
-                // Clear input stream ready for next input
-                sc.nextLine();
-            }
-        }
-
-        // Holds the path to the pack file
-        String packFilePath;
-
-        // Input pack file name
-        while(cardSim.pack == null) {
-            // Ask user for the path to the pack file
-            System.out.print("\nPlease enter location of pack to load: ");
-
-            // Read the user's input
-            packFilePath = sc.nextLine();
-
-            // Read and validate the provided pack file
-            cardSim.pack = cardSim.readPackFile(packFilePath);
-        }
+        // Ack the user to input the name for the pack file
+        cardSim.inputPackFileName(sc);
 
         // Close the input stream
         sc.close();
@@ -148,6 +109,68 @@ public class CardGame {
         // Start all threads (players)
         for (int i = 0; i < cardSim.numOfPlayers; i++) {
             cardSim.threads[i].start();
+        }
+    }
+
+    /**
+     * Repeatedly asks the user for the number of players of the game until a valid input is provided.
+     * @param sc The {@link Scanner} object used for input.
+     */
+    private void inputNumberOfPlayers(Scanner sc) {
+        boolean validNumOfPlayers = false;
+
+        while (!validNumOfPlayers) {
+            // Input number of players
+            try {
+                // Ask user for number of players
+                System.out.print("\nPlease enter the number of players: ");
+
+                // Read the user's input
+                int input = sc.nextInt();
+
+                // Ensure there are adequate players
+                if (input < 2) {
+                    throw new InputMismatchException();
+                }
+
+                // Set number of players
+                this.numOfPlayers = input;
+
+                // Ignore whitespace and go to next line
+                sc.nextLine();
+
+                // Update flag to indicate a valid number of players has been entered
+                validNumOfPlayers = true;
+            } catch (InputMismatchException e) {
+                System.out.println("ERROR: Number of players must be an Integer greater than 1.");
+                // Clear input stream ready for next input
+                sc.nextLine();
+            } catch (NoSuchElementException e) {
+                System.out.println("ERROR: Please enter a number of players.");
+                // Clear input stream ready for next input
+                sc.nextLine();
+            }
+        }
+    }
+
+    /**
+     * Repeatedly asks the user for the path to a pack file to load until a valid pack file is given.
+     * @param sc The {@link Scanner} object used for input.
+     */
+    private void inputPackFileName(Scanner sc) {
+        // Holds the path to the pack file
+        String packFilePath;
+
+        // Input pack file name
+        while(this.pack == null) {
+            // Ask user for the path to the pack file
+            System.out.print("\nPlease enter location of pack to load: ");
+
+            // Read the user's input
+            packFilePath = sc.nextLine();
+
+            // Read and validate the provided pack file
+            this.pack = this.readPackFile(packFilePath);
         }
     }
 
