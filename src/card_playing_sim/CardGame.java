@@ -2,6 +2,7 @@ package card_playing_sim;
 
 // Used for numOfPlayers, packFilePath, and pack file input
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.InputMismatchException;
 
@@ -188,9 +189,10 @@ public class CardGame {
                 // Increase number of cards tracker
                 numOfCards++;
 
-                // Ensure there are not more than 8n cards
+                // Ensure there are no more than 8n cards
                 if (numOfCards > 8*this.numOfPlayers) {
-                    throw new InvalidPackFileException("ERROR: Pack file must contain exactly 8n cards.");
+                    throw new InvalidPackFileException("ERROR: Pack file contains too many cards, " +
+                            "must contain exactly 8n cards.");
                 }
                 // Add this card to the pack
                 pack.addCardToBottom(new Card(cardValue));
@@ -198,13 +200,14 @@ public class CardGame {
 
             // Ensure there are not less than 8n cards
             if (numOfCards < 8*this.numOfPlayers) {
-                throw new InvalidPackFileException("ERROR: Pack file must contain exactly 8n cards.");
+                throw new InvalidPackFileException("ERROR: Pack file is too short, must contain exactly 8n cards.");
             }
 
-            // Ensure there are at least 4 cards of each player's index
+            // Ensure there are at least 4 cards of each player's preference
             for (int i = 0; i < playerCardCountTracker.length; i++) {
                 if (playerCardCountTracker[i] < 4) {
-                    throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 cards for each player.");
+                    throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 of each " +
+                            "player's preferred card.");
                 }
             }
         } catch (FileNotFoundException e) {
@@ -215,6 +218,9 @@ public class CardGame {
             return null;
         } catch (InvalidPackFileException e) {
             System.out.println(e.getMessage());
+            return null;
+        } catch (NoSuchElementException e) {
+            System.out.println("ERROR: Pack file is empty, must contain exactly 8n cards.");
             return null;
         }
 
