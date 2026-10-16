@@ -45,7 +45,7 @@ class Deck {
     synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
         // Check if the deck is full
         if (this.back == MAX_CARDS_IN_DECK) {
-            throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck. - Occurred within %s", Thread.currentThread().getName()));
+            throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck; occurred on: %s.", Thread.currentThread().getName()));
         }
 
         // Add the new card
@@ -73,8 +73,7 @@ class Deck {
     synchronized Card takeFromDeck() throws InvalidOperationException {
         // Check if the deck contains a card to remove
         if (this.back == 0) {
-            // TODO: revert this back to normal err message (and other instance)
-            throw new InvalidOperationException(String.format("ERROR: Cannot take from an empty deck. - %s", Thread.currentThread().getName()));
+            throw new InvalidOperationException(String.format("ERROR: Cannot take from an empty deck; occurred on: %s", Thread.currentThread().getName()));
         }
 
         // Store the reference to the card to remove
