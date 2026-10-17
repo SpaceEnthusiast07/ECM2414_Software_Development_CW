@@ -32,15 +32,6 @@ class Player implements Runnable {
     // all the deck contents to their corresponding log files
     private final CardGame MAIN_PROGRAM;
 
-    // Flag to track whether this player has won the game
-    private boolean thisPlayerWon;
-
-    // Flag to track whether another player has won the game
-    private static volatile boolean otherPlayerWon;
-
-    // Holds the winning player's value
-    private static volatile int winningPlayerValue;
-
     // Cards are taken from the left deck
     private Deck leftDeck;
 
@@ -59,10 +50,6 @@ class Player implements Runnable {
         this.PLAYER_VALUE = playerValue;
         this.MAIN_PROGRAM = mainProgram;
 
-        // Set flags
-        otherPlayerWon = false;
-        this.thisPlayerWon = false;
-
         // Initialise the hand of this player
         this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];
 
@@ -79,20 +66,17 @@ class Player implements Runnable {
      */
     @Override
     public void run() {
-        while (!otherPlayerWon && !thisPlayerWon) {
+        while (!MAIN_PROGRAM.isGameOver()) {
             // Check whether this player has won
             if (isPlayerWon()) {
-                // Mark this player as won
-                this.thisPlayerWon = true;
-
-                // Indicate to all players that this player has won the game
-                winningPlayerValue = this.PLAYER_VALUE;
-                otherPlayerWon = true;
-
-                // Output to the terminal which player has won
-                System.out.printf("player %d wins\n", this.PLAYER_VALUE);
-
-                MAIN_PROGRAM.logAllDecksContents();
+                // Attempt to mark this player as won.
+                // If not first player to declare winner, don't print
+                if (MAIN_PROGRAM.declareWinner(this.PLAYER_VALUE)) {
+                    // Output to the terminal which player has won
+                    System.out.printf("player %d wins\n", this.PLAYER_VALUE);
+                    MAIN_PROGRAM.logAllDecksContents();
+                }
+                break;
             }
             // Check whether this player can take and discard a card to its left and right deck respectively
             else if (this.leftDeck.canTakeFromDeck() && this.rightDeck.canDiscardToDeck()) {
@@ -126,7 +110,7 @@ class Player implements Runnable {
                     fw.write(String.format("player %d's current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                            this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
+                            this.PLAYER_LOG_FILE_NAME, MAIN_PROGRAM.getWinningPlayerValue());
                 } catch (InvalidOperationException e) {
                     System.out.println(e.getMessage());
                 }
@@ -227,7 +211,7 @@ class Player implements Runnable {
         // Append flag is true because we want to add more information to the log file rather than overwrite it
         try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
             // Write which player has won to log file
-            fw.write(String.format("player %d wins\n", winningPlayerValue));
+            fw.write(String.format("player %d wins\n", MAIN_PROGRAM.getWinningPlayerValue()));
 
             // Log that this player has exited the game; e.g., "player1 exits"
             fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
@@ -239,7 +223,7 @@ class Player implements Runnable {
             fw.write(String.format("player %d's final hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                    this.PLAYER_LOG_FILE_NAME, winningPlayerValue);
+                    this.PLAYER_LOG_FILE_NAME, MAIN_PROGRAM.getWinningPlayerValue());
         }
     }
 

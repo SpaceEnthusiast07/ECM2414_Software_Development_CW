@@ -39,8 +39,8 @@ public class CardGame {
     // Holds all the decks in the game
     private Deck[] decks;
 
-    // Flag to keep track of whether a player has won
-    private boolean anyPlayersWon = false;
+    // Value of the winning player (0 = no winner yet)
+    private volatile int winningPlayerValue = 0;
 
     /**
      * Default constructor (uses console and default log directory)
@@ -72,7 +72,7 @@ public class CardGame {
     /**
      * Sets up and starts a new multithreaded card playing simulation.
      */
-    public void startSim() {
+    void startSim() {
         out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
 
         // Used to input numOfPlayers and packFilePath
@@ -206,10 +206,9 @@ public class CardGame {
      */
     public synchronized void logAllDecksContents() {
         // Check if another player has already declared it has won the game
-        if (this.anyPlayersWon) {
+        if (isGameOver()) {
             return;
         }
-        this.anyPlayersWon = true;
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
@@ -290,10 +289,39 @@ public class CardGame {
     }
 
     /**
+     * Atomically sets this player as the winner.
+     * @param playerValue The value of the calling player who's won
+     * @return True if first player setting win (true winner), otherwise false - not winner
+     */
+    synchronized boolean declareWinner(int playerValue) {
+        if (this.winningPlayerValue != 0) {
+            return false;
+        }
+        this.winningPlayerValue = playerValue;
+        return true;
+    }
+
+    /**
      * Gets the string log file directory (defaults to DEFAULT_LOG_DIRECTORY)
      * @return A String log file directory
      */
     String getLogDirectory() {
         return this.logDirectory;
+    }
+
+    /**
+     * Checks if a winning player has been set yet
+     * @return True if there is a winning player, otherwise False
+     */
+    boolean isGameOver() {
+        return this.winningPlayerValue != 0;
+    }
+
+    /**
+     * Gets the value of the player who won (0 if none)
+     * @return Positive integer value of the winning player
+     */
+    int getWinningPlayerValue() {
+        return this.winningPlayerValue;
     }
 }
