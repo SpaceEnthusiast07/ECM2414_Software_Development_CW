@@ -33,6 +33,7 @@ public class DeckTest {
         return createDeckWithCardValues(values, 1);
     }
 
+    // TODO: Consider deleting as low value
     @DisplayName("TEST: Get deck value")
     @Test
     void getCardValue() {
@@ -93,4 +94,9 @@ public class DeckTest {
         //Discard 6th card to full deck and check if errors InvalidOperationException
         assertThrows(InvalidOperationException.class, () -> deck.discardToDeck(extraCard) );
     }
+
+    // TODO: takeFromDeckBoundaries
+    // TODO: discardToDeckBoundaries
+    // TODO: finalContentsLogFormat (needs tempDir)
+    // TODO: any other tests?
 }

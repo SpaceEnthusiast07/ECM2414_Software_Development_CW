@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PackTest {
+    // TODO: Setup BeforeEach and AfterEach temporary log directory
+    // TODO: Automated pack file creation (random and passed-in vals)
 
     /**
      * Calculate the number of players, n, needed by a pack (size 8n)
@@ -36,7 +38,7 @@ public class PackTest {
 
     @DisplayName("TEST: Adding and taking from pack")
     @Test
-    void packAddAndTakeInOrder() {
+    void takeTopCardReturnsCardsInOrderAdded() {
         // Create empty pack of fixed-length 8 (8*1)
         Pack myPack = new Pack(1);
 
@@ -79,4 +81,13 @@ public class PackTest {
         //Add 6th card to full pack and check if errors InvalidOperationException
         assertThrows(InvalidOperationException.class, () -> pack.addCardToBottom(extraCard) );
     }
+
+    // TODO: Tests for reading pack files
+        // TODO: packLoadsAllCardsInFileOrder
+        // TODO: packWithNonIntThrows
+        // TODO: packWithTrailingNewlineIsValid
+        // TODO: missingPackFileThrows
+        // TODO: packContainsNegativesThrows
+        // TODO: packFileWithLength (parameterised? too short, too long, exactly right)
+        // TODO: packFileWithoutWinningHand
 }

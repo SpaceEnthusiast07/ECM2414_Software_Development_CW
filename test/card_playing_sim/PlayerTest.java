@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
     private MockGameController mockGameController;
+    // TODO: Create BeforeEach AfterEach for setting and cleaning up the mockGameController
+    // TODO: Setup tempdir for log file directory
 
     /**
      * Utility to create a player holding a hand of the given card values
@@ -33,9 +35,9 @@ public class PlayerTest {
         return createPlayerWithHand(values, 1);
     }
 
-    @DisplayName("TEST: Overfilling a player's hand")
+    @DisplayName("TEST: Giving to a player's full hand throws")
     @Test
-    void overfillPlayerHand() {
+    void giveCardToFullHandThrows() {
         // Create a fresh mock game controller for player interaction
         this.mockGameController = new MockGameController("testing_logs/");
 
@@ -49,4 +51,8 @@ public class PlayerTest {
         // Give player one too many cards, and check for InvalidOperation error
         assertThrows(InvalidOperationException.class, () -> player.giveCard(card5));
     }
+
+    // TODO: InstantWIn
+    // TODO: SingleMoveThenWin
+    // TODO: parameterised repeated tests of batch runs
 }
