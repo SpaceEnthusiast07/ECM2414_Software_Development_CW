@@ -28,9 +28,9 @@ class Player implements Runnable {
     // This player's log file name
     private final String PLAYER_LOG_FILE_NAME;
 
-    // Reference to main program object so this player can ask main program to write
-    // all the deck contents to their corresponding log files
-    private final CardGame MAIN_PROGRAM;
+    // Reference to main game's GameController so this player can check game state and safely mutate, with: getting
+    // log directory, winning player's value and whether game is over, as well as informing it's won or it's exited
+    private final GameController GAME_CONTROLLER;
 
     // Cards are taken from the left deck
     private Deck leftDeck;
@@ -44,17 +44,17 @@ class Player implements Runnable {
     /**
      * Initialises a new Player.
      * @param playerValue An Integer value for this player, i.e. 1 for player1, 2 for player2, etc.
-     * @param mainProgram Reference to main program object, used for game termination.
+     * @param gamecontroller Reference to main game controller used to check and mutate game state
      */
-    Player(int playerValue, CardGame mainProgram) {
+    Player(int playerValue, GameController gamecontroller) {
         this.PLAYER_VALUE = playerValue;
-        this.MAIN_PROGRAM = mainProgram;
+        this.GAME_CONTROLLER = gamecontroller;
 
         // Initialise the hand of this player
         this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];
 
         // Construct this player's log file name
-        this.PLAYER_LOG_FILE_NAME = String.format("%splayer%d_output.txt", mainProgram.getLogDirectory(), this.PLAYER_VALUE);
+        this.PLAYER_LOG_FILE_NAME = String.format("%splayer%d_output.txt", GAME_CONTROLLER.getLogDirectory(), this.PLAYER_VALUE);
     }
 
     /**
@@ -66,12 +66,12 @@ class Player implements Runnable {
      */
     @Override
     public void run() {
-        while (!MAIN_PROGRAM.isGameOver()) {
+        while (!GAME_CONTROLLER.isGameOver()) {
             // Check whether this player has won
             if (isPlayerWon()) {
                 // Attempt to mark this player as won.
                 // If not first player to declare winner, don't print
-                if (MAIN_PROGRAM.declareWinner(this.PLAYER_VALUE)) {
+                if (GAME_CONTROLLER.declareWinner(this.PLAYER_VALUE)) {
                     // Output to the terminal which player has won
                     System.out.printf("player %d wins\n", this.PLAYER_VALUE);
                 }
@@ -120,7 +120,7 @@ class Player implements Runnable {
         this.logPlayerFinishedGame();
 
         // Inform main program that this thread has stopped
-        MAIN_PROGRAM.playerExited();
+        GAME_CONTROLLER.playerExited();
     }
 
     /**
@@ -211,7 +211,7 @@ class Player implements Runnable {
      */
     void logPlayerFinishedGame() {
         // Get the value of the player who won the game
-        int winningPlayer = MAIN_PROGRAM.getWinningPlayerValue();
+        int winningPlayer = GAME_CONTROLLER.getWinningPlayerValue();
         // Get the player's hand as a space-delimited string
         String thisPlayersHand = convertHandToString();
 

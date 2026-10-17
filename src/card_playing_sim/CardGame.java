@@ -46,6 +46,36 @@ public class CardGame {
     // Therefore, last finishing player can safely call all decks to be logged, as all other player's finished
     private final AtomicInteger numPlayersRunning = new AtomicInteger(0);
 
+    private final GameController gameController = new GameController() {
+        @Override
+        public String getLogDirectory() {
+            return CardGame.this.logDirectory;
+        }
+
+        @Override
+        public boolean isGameOver() {
+            return CardGame.this.winningPlayerValue.get() != 0;
+        }
+
+        @Override
+        public boolean declareWinner(int playerValue) {
+            // Atomically set the value to winning player value if no other player has set their value yet
+            return CardGame.this.winningPlayerValue.compareAndSet(0, playerValue);
+        }
+
+        @Override
+        public int getWinningPlayerValue() {
+            return CardGame.this.winningPlayerValue.get();
+        }
+
+        @Override
+        public void playerExited() {
+            if (CardGame.this.numPlayersRunning.decrementAndGet() == 0) {
+                CardGame.this.logAllDecksContents();
+            }
+        }
+    };
+
     /**
      * Default constructor (uses console and default log directory)
      */
@@ -97,7 +127,7 @@ public class CardGame {
         // Create an array of players with unique values
         this.players = new Player[this.numOfPlayers];
         for (int i = 0; i < this.numOfPlayers; i++) {
-            this.players[i] = new Player(i+1, this);
+            this.players[i] = new Player(i+1, this.gameController);
         }
 
         // Use round-robin to distribute cards to players
@@ -287,45 +317,5 @@ public class CardGame {
         } catch (IOException e) {
             out.println("ERROR: Cannot create directory for log files.");
         }
-    }
-
-    void playerExited() {
-        if (this.numPlayersRunning.decrementAndGet() == 0) {
-            this.logAllDecksContents();
-        }
-    }
-
-    /**
-     * Atomically sets this player as the winner, checking if any other player's have declared winning beforehand.
-     * @param playerValue The value of the calling player who's won
-     * @return True if first player setting win (true winner), otherwise false - not winner
-     */
-    boolean declareWinner(int playerValue) {
-        // Atomically set the value to winning player value if no other player has set their value yet
-        return this.winningPlayerValue.compareAndSet(0, playerValue);
-    }
-
-    /**
-     * Gets the string log file directory (defaults to DEFAULT_LOG_DIRECTORY)
-     * @return A String log file directory
-     */
-    String getLogDirectory() {
-        return this.logDirectory;
-    }
-
-    /**
-     * Checks if a winning player has been set yet
-     * @return True if there is a winning player, otherwise False
-     */
-    boolean isGameOver() {
-        return this.winningPlayerValue.get() != 0;
-    }
-
-    /**
-     * Gets the value of the player who won (0 if none)
-     * @return Positive integer value of the winning player
-     */
-    int getWinningPlayerValue() {
-        return this.winningPlayerValue.get();
     }
 }
