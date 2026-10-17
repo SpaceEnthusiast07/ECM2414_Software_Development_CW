@@ -129,7 +129,7 @@ class Deck {
 
     /**
      * Writes this deck's final contents to its log file at the end of the game.
-     *
+     * @param logDirectory The string of the directory path to log to
      */
     void logFinalDeckContents(String logDirectory) {
         String logFilePath = String.format("%sdeck%d_output.txt", logDirectory, this.deckValue);
