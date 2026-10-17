@@ -40,8 +40,11 @@ public class CardGame {
     // Holds all the decks in the game
     private Deck[] decks;
 
-    // Value of the winning player (0 = no winner yet)
+    // Holds value of the winning player (0 = no winner yet) atomically
     private final AtomicInteger winningPlayerValue = new AtomicInteger(0);
+    // Holds number of players (threads) currently running atomically
+    // Therefore, last finishing player can safely call all decks to be logged, as all other player's finished
+    private final AtomicInteger numPlayersRunning = new AtomicInteger(0);
 
     /**
      * Default constructor (uses console and default log directory)
@@ -133,9 +136,10 @@ public class CardGame {
             this.players[i].logInitialHand();
         }
 
-        // Start all threads (players)
+        // Start all threads (players) and increment running player count for each thread started
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.threads[i].start();
+            this.numPlayersRunning.incrementAndGet();
         }
     }
 
@@ -286,6 +290,12 @@ public class CardGame {
 
         } catch (IOException e) {
             out.println("ERROR: Cannot create directory for log files.");
+        }
+    }
+
+    void playerExited() {
+        if (this.numPlayersRunning.decrementAndGet() == 0) {
+            this.logAllDecksContents();
         }
     }
 

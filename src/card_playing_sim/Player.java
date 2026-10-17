@@ -74,7 +74,6 @@ class Player implements Runnable {
                 if (MAIN_PROGRAM.declareWinner(this.PLAYER_VALUE)) {
                     // Output to the terminal which player has won
                     System.out.printf("player %d wins\n", this.PLAYER_VALUE);
-                    MAIN_PROGRAM.logAllDecksContents();
                 }
                 break;
             }
@@ -119,6 +118,9 @@ class Player implements Runnable {
 
         // Write to log file this player's hand and which player won
         this.logPlayerFinishedGame();
+
+        // Inform main program that this thread has stopped
+        MAIN_PROGRAM.playerExited();
     }
 
     /**
@@ -196,7 +198,7 @@ class Player implements Runnable {
             String thisPlayersHand = convertHandToString();
 
             // Log this player's initial hand to their log file
-            fw.write(String.format("player %d initial hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
+            fw.write(String.format("player %d initial hand %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
                     this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
