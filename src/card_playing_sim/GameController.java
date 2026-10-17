@@ -1,5 +1,6 @@
 package card_playing_sim;
 
+// TODO: Add Javadoc class description
 public interface GameController {
     /**
      * Atomically sets this player as the winner, checking if any other player's have declared winning beforehand.

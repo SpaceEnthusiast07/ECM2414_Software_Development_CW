@@ -44,11 +44,11 @@ class Player implements Runnable {
     /**
      * Initialises a new Player.
      * @param playerValue An Integer value for this player, i.e. 1 for player1, 2 for player2, etc.
-     * @param gamecontroller Reference to main game controller used to check and mutate game state
+     * @param playerGamecontroller Reference to main game controller used to check and mutate game state
      */
-    Player(int playerValue, GameController gamecontroller) {
+    Player(int playerValue, GameController playerGamecontroller) {
         this.PLAYER_VALUE = playerValue;
-        this.GAME_CONTROLLER = gamecontroller;
+        this.GAME_CONTROLLER = playerGamecontroller;
 
         // Initialise the hand of this player
         this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];

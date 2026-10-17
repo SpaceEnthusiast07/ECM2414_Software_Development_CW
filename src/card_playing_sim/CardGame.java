@@ -10,10 +10,10 @@ import java.util.InputMismatchException;
 
 // Used to create log file directory
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: Add Javadoc class description
 public class CardGame {
     // Stores the number of cards in a player's hand
     static final int NUM_CARDS_IN_HAND = 4;
@@ -46,35 +46,8 @@ public class CardGame {
     // Therefore, last finishing player can safely call all decks to be logged, as all other player's finished
     private final AtomicInteger numPlayersRunning = new AtomicInteger(0);
 
-    private final GameController gameController = new GameController() {
-        @Override
-        public String getLogDirectory() {
-            return CardGame.this.logDirectory;
-        }
-
-        @Override
-        public boolean isGameOver() {
-            return CardGame.this.winningPlayerValue.get() != 0;
-        }
-
-        @Override
-        public boolean declareWinner(int playerValue) {
-            // Atomically set the value to winning player value if no other player has set their value yet
-            return CardGame.this.winningPlayerValue.compareAndSet(0, playerValue);
-        }
-
-        @Override
-        public int getWinningPlayerValue() {
-            return CardGame.this.winningPlayerValue.get();
-        }
-
-        @Override
-        public void playerExited() {
-            if (CardGame.this.numPlayersRunning.decrementAndGet() == 0) {
-                CardGame.this.logAllDecksContents();
-            }
-        }
-    };
+    // Encapsulated game interaction logic handed only to player's
+    private final GameController playerGameController = new PlayerGameController();
 
     /**
      * Default constructor (uses console and default log directory)
@@ -127,7 +100,7 @@ public class CardGame {
         // Create an array of players with unique values
         this.players = new Player[this.numOfPlayers];
         for (int i = 0; i < this.numOfPlayers; i++) {
-            this.players[i] = new Player(i+1, this.gameController);
+            this.players[i] = new Player(i+1, this.playerGameController);
         }
 
         // Use round-robin to distribute cards to players
@@ -318,4 +291,41 @@ public class CardGame {
             out.println("ERROR: Cannot create directory for log files.");
         }
     }
+
+    /**
+     * Holds player interaction logic with game state, passed to each {@link Player}
+     * Kept private so only players can declare winner or report exiting
+     */
+    private class PlayerGameController implements GameController {
+        @Override
+        public String getLogDirectory() {
+            return logDirectory;
+        }
+
+        @Override
+        public boolean isGameOver() {
+            // If a winning player value has been set, then someone has won and the game is over
+            return winningPlayerValue.get() != 0;
+        }
+
+        @Override
+        public boolean declareWinner(int playerValue) {
+            // Atomically set the value to winning player value if no other player has set their value yet
+            return winningPlayerValue.compareAndSet(0, playerValue);
+        }
+
+        @Override
+        public int getWinningPlayerValue() {
+            return winningPlayerValue.get();
+        }
+
+        @Override
+        public void playerExited() {
+            // Decrement the number of players (threads) running
+            // If last player to finish, call for decks to be logged to logfiles
+            if (numPlayersRunning.decrementAndGet() == 0) {
+                logAllDecksContents();
+            }
+        }
+    };
 }
