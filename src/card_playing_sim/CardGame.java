@@ -206,20 +206,14 @@ public class CardGame {
     }
 
     /**
-     * Logs each deck's contents to their corresponding log file once a player has declared they have won. Synchronization is used
-     * to ensure no other thread can log deck contents at the same time as another thread.
+     * Logs each deck's contents to their corresponding log file after all threads have finished
+     * No synchronization needed as only called once at the very end, by CardGame itself
      */
-    public synchronized void logAllDecksContents() {
-        // Check if another player has already declared it has won the game
-        if (isGameOver()) {
-            return;
-        }
-
+    void logAllDecksContents() {
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.decks[i].logFinalDeckContents(this.logDirectory);
         }
-
     }
 
     /**
