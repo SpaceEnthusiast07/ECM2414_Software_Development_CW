@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
+    private MockGameController mockGameController;
 
     @DisplayName("TEST: Overfilling a player's hand")
     @Test
     void overfillPlayerHand() {
-        // Create a new player (no mainProgram needed)
-        Player player = new Player(1, null);
+        // Create a fresh mock game controller for player interaction
+        this.mockGameController = new MockGameController("testing_logs/");
+
+        // Create a new player
+        Player player = new Player(1, mockGameController);
 
         // Create 5 cards (1 too many)
         Card card1 = new Card(1);
