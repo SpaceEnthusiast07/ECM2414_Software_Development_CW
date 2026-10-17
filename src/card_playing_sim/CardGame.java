@@ -327,42 +327,5 @@ public class CardGame {
                 logAllDecksContents();
             }
         }
-    };
-
-    /**
-     * Holds player interaction logic with game state, passed to each {@link Player}
-     * Kept private so only players can declare winner or report exiting
-     */
-    private class PlayerGameController implements GameController {
-        @Override
-        public String getLogDirectory() {
-            return logDirectory;
-        }
-
-        @Override
-        public boolean isGameOver() {
-            // If a winning player value has been set, then someone has won and the game is over
-            return winningPlayerValue.get() != 0;
-        }
-
-        @Override
-        public boolean declareWinner(int playerValue) {
-            // Atomically set the value to winning player value if no other player has set their value yet
-            return winningPlayerValue.compareAndSet(0, playerValue);
-        }
-
-        @Override
-        public int getWinningPlayerValue() {
-            return winningPlayerValue.get();
-        }
-
-        @Override
-        public void playerExited() {
-            // Decrement the number of players (threads) running
-            // If last player to finish, call for decks to be logged to logfiles
-            if (numPlayersRunning.decrementAndGet() == 0) {
-                logAllDecksContents();
-            }
-        }
     }
 }
