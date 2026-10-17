@@ -114,7 +114,7 @@ class Deck {
      * Converts this deck's contents to a String so it can be written to this deck's log file.
      * @return The String representation of this deck's contents.
      */
-    private String convertDeckContentsToString() {
+    String convertDeckContentsToString() {
         String thisDecksContents = "";
         int indexOfCardToConvert = 0;
 

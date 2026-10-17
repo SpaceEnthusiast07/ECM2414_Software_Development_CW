@@ -144,7 +144,7 @@ class Player implements Runnable {
      * Determines if this player has won the game.
      * @return True if this player has won the game, false otherwise.
      */
-    private boolean isPlayerWon() {
+    boolean isPlayerWon() {
         boolean isWon = true;
         int cardIndexInHand = 0;
 
@@ -178,7 +178,7 @@ class Player implements Runnable {
      * Converts this player's hand to a String so it can be written to this player's log file.
      * @return This player's hand represented as a String.
      */
-    private String convertHandToString() {
+    String convertHandToString() {
         String thisPlayersHand = "";
         for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
             thisPlayersHand = thisPlayersHand.concat(this.hand[i].value() + " ");
@@ -207,7 +207,7 @@ class Player implements Runnable {
      * Writes which player won the game, the fact that this player has exited the game, and this
      * player's final hand to this player's log file.
      */
-    private void logWinningPlayer() {
+    void logWinningPlayer() {
         // Append flag is true because we want to add more information to the log file rather than overwrite it
         try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
             // Write which player has won to log file
@@ -231,7 +231,7 @@ class Player implements Runnable {
      * Randomly chooses a card to discard that is not the value of this player.
      * @return The randomly chosen card index to discard.
      */
-    private int getRandomDiscardableCardIndex() {
+    int getRandomDiscardableCardIndex() {
         // Create array to hold potential discardable indices
         int[] potentialDiscardableIndices = new int[CardGame.NUM_CARDS_IN_HAND];
 

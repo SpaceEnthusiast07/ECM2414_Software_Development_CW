@@ -221,7 +221,7 @@ public class CardGame {
      * Uses round-robin to distribute cards from the pack to each player.
      * Done before distributing cards to decks.
      */
-    private void distributeCardsToPlayers() throws InvalidOperationException {
+    void distributeCardsToPlayers() throws InvalidOperationException {
         // Iterate through the number of cards to give to each player
         for (int i = 0; i < NUM_CARDS_IN_HAND; i++) {
             // Iterate through each player
@@ -236,7 +236,7 @@ public class CardGame {
      * Uses round-robin to distribute cards from the pack to each deck.
      * Done after distributing cards to players.
      */
-    private void distributeCardsToDecks() throws InvalidOperationException {
+    void distributeCardsToDecks() throws InvalidOperationException {
         // Iterate through the number of cards to give to each deck
         for (int i = 0; i < NUM_CARDS_IN_DECK; i++) {
             // Iterate through each deck
@@ -251,7 +251,7 @@ public class CardGame {
      * Assigns each player their corresponding left and right deck. For player i, their left
      * deck is deck i and their right deck is deck i+1.
      */
-    private void assignDecksToPlayers() {
+    void assignDecksToPlayers() {
         // Iterate through each player
         for (int i = 0; i < numOfPlayers; i++) {
             // Left deck is deck i for player i
