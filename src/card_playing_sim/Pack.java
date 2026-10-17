@@ -121,7 +121,7 @@ class Pack {
 
         try (Scanner sc = new Scanner(packFile)) {
             // Loop through each line in the pack file
-            while (sc.hasNextLine()) {
+            while (sc.hasNext()) {
                 cardValue = sc.nextInt();
                 // Ensure card value is positive
                 if (cardValue < 1) {
