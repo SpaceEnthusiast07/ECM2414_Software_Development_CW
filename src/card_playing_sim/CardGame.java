@@ -36,8 +36,8 @@ public class CardGame {
     // Holds all the decks in the game
     private Deck[] decks;
 
-    // Flag to keep track of whether a player has won - THREAD CONFINED
-    private static boolean anyPlayersWon = false;
+    // Flag to keep track of whether a player has won
+    private boolean anyPlayersWon = false;
 
     public static void main(String[] args) {
         // Create a new simulation instance
