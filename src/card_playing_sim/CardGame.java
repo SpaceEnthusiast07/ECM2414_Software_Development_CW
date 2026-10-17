@@ -136,10 +136,12 @@ public class CardGame {
             this.players[i].logInitialHand();
         }
 
+        // Set number of players running before any thread starts, so the count can't decrement to 0 early on quick end
+        this.numPlayersRunning.set(this.numOfPlayers);
+
         // Start all threads (players) and increment running player count for each thread started
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.threads[i].start();
-            this.numPlayersRunning.incrementAndGet();
         }
     }
 
