@@ -109,8 +109,8 @@ class Player implements Runnable {
                     // Write this player's hand to the log file
                     fw.write(String.format("player %d's current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
                 } catch (IOException e) {
-                    System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                            this.PLAYER_LOG_FILE_NAME, MAIN_PROGRAM.getWinningPlayerValue());
+                    System.out.printf("ERROR: Failed to write Player %d action to log file \"%s\"",
+                            this.PLAYER_VALUE, this.PLAYER_LOG_FILE_NAME);
                 } catch (InvalidOperationException e) {
                     System.out.println(e.getMessage());
                 }
