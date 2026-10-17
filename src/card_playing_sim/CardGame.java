@@ -184,10 +184,10 @@ public class CardGame {
      */
     public synchronized void logAllDecksContents() {
         // Check if another player has already declared it has won the game
-        if (anyPlayersWon) {
+        if (this.anyPlayersWon) {
             return;
         }
-        anyPlayersWon = true;
+        this.anyPlayersWon = true;
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
