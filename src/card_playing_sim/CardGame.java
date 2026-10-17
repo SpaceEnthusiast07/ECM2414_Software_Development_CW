@@ -94,7 +94,7 @@ public class CardGame {
         // Set up the log file directory
         this.setUpLogFileDirectory();
 
-        // Create an array of players
+        // Create an array of players with unique values
         this.players = new Player[this.numOfPlayers];
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.players[i] = new Player(i+1, this);
@@ -107,7 +107,7 @@ public class CardGame {
             endProgram(e.getMessage());
         }
 
-        // Create an array of decks
+        // Create an array of decks with unique values
         this.decks = new Deck[this.numOfPlayers];
         for (int i = 0; i < this.numOfPlayers; i++) {
             this.decks[i] = new Deck(i+1);
@@ -139,9 +139,9 @@ public class CardGame {
         // Set number of players running before any thread starts, so the count can't decrement to 0 early on quick end
         this.numPlayersRunning.set(this.numOfPlayers);
 
-        // Start all threads (players) and increment running player count for each thread started
-        for (int i = 0; i < this.numOfPlayers; i++) {
-            this.threads[i].start();
+        // Start all threads (players)
+        for (Thread thread : this.threads) {
+            thread.start();
         }
     }
 
