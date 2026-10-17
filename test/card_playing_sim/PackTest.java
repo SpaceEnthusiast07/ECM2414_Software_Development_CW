@@ -10,8 +10,8 @@ public class PackTest {
     @DisplayName("TEST: Adding and taking from pack")
     @Test
     void packAddAndTake() {
-        // Create empty pack of fixed-length 3
-        Pack myPack = new Pack(3);
+        // Create empty pack of fixed-length 8 (8*1)
+        Pack myPack = new Pack(1);
 
         // Create 3 cards of different values (1,3,2)
         Card card1 = new Card(1);
