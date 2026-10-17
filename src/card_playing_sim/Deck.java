@@ -131,8 +131,8 @@ class Deck {
      * Writes this deck's final contents to its log file at the end of the game.
      *
      */
-    void logFinalDeckContents() {
-        String logFilePath = String.format("%sdeck%d_output.txt", CardGame.DEFAULT_LOG_DIRECTORY, this.deckValue);
+    void logFinalDeckContents(String logDirectory) {
+        String logFilePath = String.format("%sdeck%d_output.txt", logDirectory, this.deckValue);
 
         // Append flag is false, by default, because we want a fresh deck log file each game
         try (FileWriter fw = new FileWriter(logFilePath)) {

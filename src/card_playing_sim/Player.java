@@ -67,7 +67,7 @@ class Player implements Runnable {
         this.hand = new Card[CardGame.NUM_CARDS_IN_HAND];
 
         // Construct this player's log file name
-        this.PLAYER_LOG_FILE_NAME = String.format("%splayer%d_output.txt", CardGame.DEFAULT_LOG_DIRECTORY, this.PLAYER_VALUE);
+        this.PLAYER_LOG_FILE_NAME = String.format("%splayer%d_output.txt", mainProgram.getLogDirectory(), this.PLAYER_VALUE);
     }
 
     /**

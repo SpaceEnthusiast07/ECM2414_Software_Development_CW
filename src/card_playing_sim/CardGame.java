@@ -213,7 +213,7 @@ public class CardGame {
 
         // Log the contents of each deck to its corresponding log file
         for (int i = 0; i < this.numOfPlayers; i++) {
-            this.decks[i].logFinalDeckContents();
+            this.decks[i].logFinalDeckContents(this.logDirectory);
         }
 
     }
@@ -281,13 +281,9 @@ public class CardGame {
      */
     private void setUpLogFileDirectory() {
         try {
-            // Create a path object for the log files
-            Path path = Paths.get(String.format("%splayer1_output.txt", this.logDirectory));
+            // Create an empty directory for log output files
+            Files.createDirectories(Paths.get(this.logDirectory));
 
-            if (path.getParent() != null) {
-                // Create the log file directory
-                Files.createDirectories(path.getParent());
-            }
         } catch (IOException e) {
             out.println("ERROR: Cannot create directory for log files.");
         }
