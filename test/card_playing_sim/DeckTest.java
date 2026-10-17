@@ -34,14 +34,14 @@ public class DeckTest {
         myDeck.discardToDeck(card3);
 
         // Take 1 card from deck and check is value of first card discarded
-        assertEquals(card2.getValue(), myDeck.takeFromDeck().getValue());
+        assertEquals(card2.value(), myDeck.takeFromDeck().value());
 
         // Discard the last card to deck
         myDeck.discardToDeck(card1);
 
         // Take both remaining cards from deck and check values are in FIFO order
-        assertEquals(card3.getValue(), myDeck.takeFromDeck().getValue());
-        assertEquals(card1.getValue(), myDeck.takeFromDeck().getValue());
+        assertEquals(card3.value(), myDeck.takeFromDeck().value());
+        assertEquals(card1.value(), myDeck.takeFromDeck().value());
     }
 
     @DisplayName("TEST: Taking from an empty deck")
@@ -61,28 +61,22 @@ public class DeckTest {
         Deck myDeck = new Deck(1);
 
 
-        // Create 9 cards (deck has max size 8)
+        // Create 6 cards (deck has max size 5)
         Card card1 = new Card(3);
         Card card2 = new Card(2);
         Card card3 = new Card(5);
         Card card4 = new Card(2);
         Card card5 = new Card(1);
         Card card6 = new Card(5);
-        Card card7 = new Card(2);
-        Card card8 = new Card(6);
-        Card card9 = new Card(9);
 
-        // Discard 7 cards to deck
+        // Discard 5 cards to deck
         myDeck.discardToDeck(card1);
         myDeck.discardToDeck(card2);
         myDeck.discardToDeck(card3);
         myDeck.discardToDeck(card4);
         myDeck.discardToDeck(card5);
-        myDeck.discardToDeck(card6);
-        myDeck.discardToDeck(card7);
-        myDeck.discardToDeck(card8);
 
-        //Add 9th card to full deck and check if errors InvalidOperationException
-        assertThrows(InvalidOperationException.class, () -> myDeck.discardToDeck(card9) );
+        //Discard 6th card to full deck and check if errors InvalidOperationException
+        assertThrows(InvalidOperationException.class, () -> myDeck.discardToDeck(card6) );
     }
 }

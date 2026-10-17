@@ -14,6 +14,6 @@ class CardTest {
         Card myCard = new Card(myNumber);
 
         // Call getter and check returned value is 5
-        assertEquals(myNumber, myCard.getValue());
+        assertEquals(myNumber, myCard.value());
     }
 }

@@ -24,9 +24,9 @@ public class PackTest {
         myPack.addCardToBottom(card1);
 
         // Take the cards off the top and check they are same order added in
-        assertEquals(card2.getValue(), myPack.takeTopCard().getValue());
-        assertEquals(card3.getValue(), myPack.takeTopCard().getValue());
-        assertEquals(card1.getValue(), myPack.takeTopCard().getValue());
+        assertEquals(card2.value(), myPack.takeTopCard().value());
+        assertEquals(card3.value(), myPack.takeTopCard().value());
+        assertEquals(card1.value(), myPack.takeTopCard().value());
     }
 
     @DisplayName("TEST: Taking from an empty pack")

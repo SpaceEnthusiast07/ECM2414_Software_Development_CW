@@ -7,7 +7,7 @@ package card_playing_sim;
  * <br>
  * - The value of a card is a constant; hence, cannot be changed.
  * <br>
- * - To retrieve a card's value, call {@link #value ()}.
+ * - To retrieve a card's value, call the {@link #value()} method.
  *
  * @param value Each card has an associated value
  */
