@@ -107,7 +107,7 @@ class Player implements Runnable {
                     String thisPlayersHand = convertHandToString();
 
                     // Write this player's hand to the log file
-                    fw.write(String.format("player %d's current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
+                    fw.write(String.format("player %d current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
                 } catch (IOException e) {
                     System.out.printf("ERROR: Failed to write Player %d action to log file \"%s\"",
                             this.PLAYER_VALUE, this.PLAYER_LOG_FILE_NAME);
@@ -118,7 +118,7 @@ class Player implements Runnable {
         }
 
         // Write to log file this player's hand and which player won
-        this.logWinningPlayer();
+        this.logPlayerFinishedGame();
     }
 
     /**
@@ -196,7 +196,7 @@ class Player implements Runnable {
             String thisPlayersHand = convertHandToString();
 
             // Log this player's initial hand to their log file
-            fw.write(String.format("player %d's initial hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
+            fw.write(String.format("player %d initial hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write initial hand to log file \"%s\" for player%d\n",
                     this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
@@ -207,23 +207,35 @@ class Player implements Runnable {
      * Writes which player won the game, the fact that this player has exited the game, and this
      * player's final hand to this player's log file.
      */
-    void logWinningPlayer() {
-        // Append flag is true because we want to add more information to the log file rather than overwrite it
+    void logPlayerFinishedGame() {
+        // Get the value of the player who won the game
+        int winningPlayer = MAIN_PROGRAM.getWinningPlayerValue();
+        // Get the player's hand as a space-delimited string
+        String thisPlayersHand = convertHandToString();
+
+        // Append logs to end of log file
         try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
-            // Write which player has won to log file
-            fw.write(String.format("player %d wins\n", MAIN_PROGRAM.getWinningPlayerValue()));
+            if (winningPlayer == this.PLAYER_VALUE) {
+                // Write which player has won to log file
+                fw.write(String.format("player %d wins\n", winningPlayer));
+                // Log that this player has exited the game; e.g., "player1 exits"
+                fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
+                // Log this player's final hand
+                fw.write(String.format("player %d final hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
+            } else {
+                // Write which player has won to log file
+                fw.write(String.format("player %d has informed player %d that player %d has won\n",
+                        winningPlayer, this.PLAYER_VALUE, winningPlayer));
+                // Log that this player has exited the game; e.g., "player1 exits"
+                fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
+                // Log this player's final hand
+                fw.write(String.format("player %d hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
 
-            // Log that this player has exited the game; e.g., "player1 exits"
-            fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
+            }
 
-            // Convert this player's hand to a string
-            String thisPlayersHand = convertHandToString();
-
-            // Log this player's final hand
-            fw.write(String.format("player %d's final hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
         } catch (IOException e) {
-            System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for winning player%d\n",
-                    this.PLAYER_LOG_FILE_NAME, MAIN_PROGRAM.getWinningPlayerValue());
+            System.out.printf("ERROR: Failed to write winning player stats to log file \"%s\" for player%d\n",
+                    this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
         }
     }
 
