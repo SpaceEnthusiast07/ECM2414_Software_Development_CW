@@ -15,6 +15,8 @@ public class PlayerTest {
      */
     private Player createPlayerWithHand(int[] values, int playerValue) {
         Player player = new Player(playerValue, mockGameController);
+
+        // Create and give cards to player hand in order, using values
         for (int val : values) {
             player.giveCard(new Card(val));
         }
