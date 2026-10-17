@@ -22,7 +22,7 @@ class Player implements Runnable {
     // Each player has a hand of 4 cards - THREAD CONFINED
     private Card[] hand;
 
-    // The value of this player, i.e. 1 for player1, 2 for player2, etc
+    // The unique integer value of this player, i.e. 1 for player1, 2 for player2, etc
     private final int PLAYER_VALUE;
 
     // This player's log file name
