@@ -2,6 +2,8 @@ package card_playing_sim;
 
 // Used for numOfPlayers, packFilePath, and pack file input
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.InputMismatchException;
@@ -12,32 +14,52 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CardGame {
-    // Represents the number of players, equivalent of n in documentation
-    private int numOfPlayers;
-
     // Stores the number of cards in a player's hand
     static final int NUM_CARDS_IN_HAND = 4;
-
     // Stores the number of cards in a player's hand
     static final int NUM_CARDS_IN_DECK = 4;
-
     // Stores the string directory name of where log files are stored to
-    static final String LOG_FILE_DIRECTORY = "card_playing_sim_log_files/";
+    static final String DEFAULT_LOG_DIRECTORY = "card_playing_sim_log_files/";
 
+    // Input Stream (either System.in or testing byte stream)
+    private final InputStream in;
+    // Print Stream (either System.out or testing byte stream)
+    private final PrintStream out;
+    // Custom logDirectory (defaults to DEFAULT_LOG_DIRECTORY) for testing
+    private final String logDirectory;
+
+    // Represents the number of players, equivalent of n in documentation
+    private int numOfPlayers;
     // Holds the pack of cards read from file
     private Pack pack;
-
     // Holds all the players of the game
     private Player[] players;
-
     // Holds all the threads used to run each player on
     private Thread[] threads;
-
     // Holds all the decks in the game
     private Deck[] decks;
 
     // Flag to keep track of whether a player has won
     private boolean anyPlayersWon = false;
+
+    /**
+     * Default constructor (uses console and default log directory)
+     */
+    public CardGame() {
+        this(System.in, System.out, DEFAULT_LOG_DIRECTORY);
+    }
+
+    /**
+     * Constructor with custom in and out streams, and logDirectory
+     * @param in An InputStream (e.g. System.in)
+     * @param out A PrintStream (e.g. System.out)
+     * @param logDirectory A custom logDirectory String path for storing program log files
+     */
+    CardGame(InputStream in, PrintStream out, String logDirectory) {
+        this.in = in;
+        this.out = out;
+        this.logDirectory = logDirectory;
+    }
 
     public static void main(String[] args) {
         // Create a new simulation instance
@@ -51,10 +73,10 @@ public class CardGame {
      * Sets up and starts a new multithreaded card playing simulation.
      */
     public void startSim() {
-        System.out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
+        out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
 
         // Used to input numOfPlayers and packFilePath
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(in);
 
         // Ask the user to input the number of players
         this.inputNumberOfPlayers(sc);
@@ -127,7 +149,7 @@ public class CardGame {
             // Input number of players
             try {
                 // Ask user for number of players
-                System.out.print("\nPlease enter the number of players: ");
+                out.print("\nPlease enter the number of players: ");
 
                 // Read the user's input
                 int input = sc.nextInt();
@@ -146,11 +168,11 @@ public class CardGame {
                 // Update flag to indicate a valid number of players has been entered
                 validNumOfPlayers = true;
             } catch (InputMismatchException e) {
-                System.out.println("ERROR: Number of players must be an Integer greater than 1.");
+                out.println("ERROR: Number of players must be an Integer greater than 1.");
                 // Clear input stream ready for next input
                 sc.nextLine();
             } catch (NoSuchElementException e) {
-                System.out.println("ERROR: Please enter a number of players.");
+                out.println("ERROR: Please enter a number of players.");
                 // Clear input stream ready for next input
                 sc.nextLine();
             }
@@ -168,7 +190,7 @@ public class CardGame {
         // Input pack file name
         while(this.pack == null) {
             // Ask user for the path to the pack file
-            System.out.print("\nPlease enter location of pack to load: ");
+            out.print("\nPlease enter location of pack to load: ");
 
             // Read the user's input
             packFilePath = sc.nextLine();
@@ -260,14 +282,22 @@ public class CardGame {
     private void setUpLogFileDirectory() {
         try {
             // Create a path object for the log files
-            Path path = Paths.get(String.format("%splayer1_output.txt", LOG_FILE_DIRECTORY));
+            Path path = Paths.get(String.format("%splayer1_output.txt", this.logDirectory));
 
             if (path.getParent() != null) {
                 // Create the log file directory
                 Files.createDirectories(path.getParent());
             }
         } catch (IOException e) {
-            System.out.println("ERROR: Cannot create directory for log files.");
+            out.println("ERROR: Cannot create directory for log files.");
         }
+    }
+
+    /**
+     * Gets the string log file directory (defaults to DEFAULT_LOG_DIRECTORY)
+     * @return A String log file directory
+     */
+    String getLogDirectory() {
+        return this.logDirectory;
     }
 }
