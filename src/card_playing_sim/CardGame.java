@@ -12,6 +12,7 @@ import java.util.InputMismatchException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardGame {
     // Stores the number of cards in a player's hand
@@ -40,7 +41,7 @@ public class CardGame {
     private Deck[] decks;
 
     // Value of the winning player (0 = no winner yet)
-    private volatile int winningPlayerValue = 0;
+    private final AtomicInteger winningPlayerValue = new AtomicInteger(0);
 
     /**
      * Default constructor (uses console and default log directory)
@@ -289,16 +290,13 @@ public class CardGame {
     }
 
     /**
-     * Atomically sets this player as the winner.
+     * Atomically sets this player as the winner, checking if any other player's have declared winning beforehand.
      * @param playerValue The value of the calling player who's won
      * @return True if first player setting win (true winner), otherwise false - not winner
      */
-    synchronized boolean declareWinner(int playerValue) {
-        if (this.winningPlayerValue != 0) {
-            return false;
-        }
-        this.winningPlayerValue = playerValue;
-        return true;
+    boolean declareWinner(int playerValue) {
+        // Atomically set the value to winning player value if no other player has set their value yet
+        return this.winningPlayerValue.compareAndSet(0, playerValue);
     }
 
     /**
@@ -314,7 +312,7 @@ public class CardGame {
      * @return True if there is a winning player, otherwise False
      */
     boolean isGameOver() {
-        return this.winningPlayerValue != 0;
+        return this.winningPlayerValue.get() != 0;
     }
 
     /**
@@ -322,6 +320,6 @@ public class CardGame {
      * @return Positive integer value of the winning player
      */
     int getWinningPlayerValue() {
-        return this.winningPlayerValue;
+        return this.winningPlayerValue.get();
     }
 }
