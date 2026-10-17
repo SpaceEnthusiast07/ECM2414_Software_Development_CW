@@ -193,8 +193,8 @@ public class CardGame {
             // Ask user for the path to the pack file
             out.print("\nPlease enter location of pack to load: ");
 
-            // Read the user's input
-            packFilePath = sc.nextLine();
+            // Read the user's input and trim whitespace off ends
+            packFilePath = sc.nextLine().trim();
 
             // Read and validate the provided pack file
             this.pack = Pack.readPackFile(packFilePath, this.numOfPlayers);
