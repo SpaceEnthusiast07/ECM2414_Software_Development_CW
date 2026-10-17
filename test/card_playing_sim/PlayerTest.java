@@ -38,8 +38,8 @@ public class PlayerTest {
         this.mockGameController = new MockGameController("testing_logs/");
 
         // Create a player with an initial full hand of 4 cards
-        int[] initialCards = {1,5,2,7};
-        Player player = createPlayerWithHand(initialCards);
+        int[] initialCardVals = {1,5,2,7};
+        Player player = createPlayerWithHand(initialCardVals);
 
         // Create a 5th card
         Card card5 = new Card(2);
