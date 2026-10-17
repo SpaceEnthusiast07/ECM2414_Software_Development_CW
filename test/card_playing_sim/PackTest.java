@@ -7,16 +7,43 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PackTest {
 
+    /**
+     * Calculate the number of players, n, needed by a pack (size 8n)
+     * @param cardCount A positive number of cards that should be in the pack
+     * @return The number of players that pack needs (rounded up)
+     */
+    private int numPlayersNeededForCards(int cardCount) {
+        // Add 7 to get into next 8n interval and perform integer division by 8
+        return (cardCount + 7) / 8;
+    }
+
+    /**
+     * Create a pack full of cards with the given values
+     * @param values The numbers that should be on each card, in order
+     * @return The created pack with all cards added
+     */
+    private Pack createPackWithCards(int[] values) {
+        // Create empty cards array of values' length
+        Card[] cards = new Card[values.length];
+
+        // For each card value, make a card and put in cards array
+        for (int i = 0; i < values.length; i++) {
+            cards[i] = new Card(values[i]);
+        }
+
+        return new Pack(cards);
+    }
+
     @DisplayName("TEST: Adding and taking from pack")
     @Test
-    void packAddAndTake() {
+    void packAddAndTakeInOrder() {
         // Create empty pack of fixed-length 8 (8*1)
         Pack myPack = new Pack(1);
 
-        // Create 3 cards of different values (1,3,2)
-        Card card1 = new Card(1);
-        Card card2 = new Card(3);
-        Card card3 = new Card(2);
+        // Create 3 cards of different values (4,9,7) - added manually for clearer reading
+        Card card1 = new Card(4);
+        Card card2 = new Card(9);
+        Card card3 = new Card(7);
 
         // Insert cards sequentially at bottom of pack
         myPack.addCardToBottom(card2);
@@ -24,14 +51,14 @@ public class PackTest {
         myPack.addCardToBottom(card1);
 
         // Take the cards off the top and check they are same order added in
-        assertEquals(card2.value(), myPack.takeTopCard().value());
-        assertEquals(card3.value(), myPack.takeTopCard().value());
-        assertEquals(card1.value(), myPack.takeTopCard().value());
+        assertEquals(9, myPack.takeTopCard().value());
+        assertEquals(7, myPack.takeTopCard().value());
+        assertEquals(4, myPack.takeTopCard().value());
     }
 
-    @DisplayName("TEST: Taking from an empty pack")
+    @DisplayName("TEST: Taking from an empty pack throws")
     @Test
-    void takeFromEmptyPack() {
+    void takeFromEmptyPackThrows() {
         // Create an empty pack
         Pack emptyPack = new Pack(1);
 
@@ -39,24 +66,17 @@ public class PackTest {
         assertThrows(InvalidOperationException.class, () -> emptyPack.takeTopCard() );
     }
 
-    @DisplayName("TEST: Adding to a full pack")
+    @DisplayName("TEST: Adding to a full pack throws")
     @Test
-    void addToFullPack() {
-        // Create 5 cards
-        Card card1 = new Card(3);
-        Card card2 = new Card(2);
-        Card card3 = new Card(5);
-        Card card4 = new Card(2);
-        Card card5 = new Card(1);
-
-        // Create a pack with the 5 cards (setting max of 5)
-        Card[] myCards = {card1, card2, card3, card4, card5};
-        Pack myPack = new Pack(myCards);
+    void addToFullPackThrows() {
+        // Create a pack with an initial 5 cards
+        int[] initialCardVals = {3,2,5,2,1};
+        Pack pack = createPackWithCards(initialCardVals);
 
         // Create an additional card
-        Card card6 = new Card(5);
+        Card extraCard = new Card(5);
 
         //Add 6th card to full pack and check if errors InvalidOperationException
-        assertThrows(InvalidOperationException.class, () -> myPack.addCardToBottom(card6) );
+        assertThrows(InvalidOperationException.class, () -> pack.addCardToBottom(extraCard) );
     }
 }
