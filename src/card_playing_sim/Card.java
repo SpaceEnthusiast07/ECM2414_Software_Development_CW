@@ -9,6 +9,6 @@ package card_playing_sim;
  * <br>
  * - To retrieve a card's value, call the {@link #value()} method.
  *
- * @param value Each card has an associated value
+ * @param value The value of this card as an Integer.
  */
 record Card(int value) {}
