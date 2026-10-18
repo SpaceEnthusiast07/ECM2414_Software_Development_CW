@@ -10,6 +10,7 @@ import java.util.InputMismatchException;
 
 // Used to create log file directory
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,14 +21,14 @@ public class CardGame {
     // Stores the number of cards in a player's hand
     static final int NUM_CARDS_IN_DECK = 4;
     // Stores the string directory name of where log files are stored to
-    static final String DEFAULT_LOG_DIRECTORY = "card_playing_sim_log_files/";
+    static final Path DEFAULT_LOG_DIRECTORY = Paths.get("card_playing_sim_log_files");
 
     // Input Stream (either System.in or testing byte stream)
     private final InputStream in;
     // Print Stream (either System.out or testing byte stream)
     private final PrintStream out;
     // Custom logDirectory (defaults to DEFAULT_LOG_DIRECTORY) for testing
-    private final String logDirectory;
+    private final Path logDirectory;
 
     // Represents the number of players, equivalent of n in documentation
     private int numOfPlayers;
@@ -62,7 +63,7 @@ public class CardGame {
      * @param out A PrintStream (e.g. System.out)
      * @param logDirectory A custom logDirectory String path for storing program log files
      */
-    CardGame(InputStream in, PrintStream out, String logDirectory) {
+    CardGame(InputStream in, PrintStream out, Path logDirectory) {
         this.in = in;
         this.out = out;
         this.logDirectory = logDirectory;
@@ -216,8 +217,8 @@ public class CardGame {
      */
     void logAllDecksContents() {
         // Log the contents of each deck to its corresponding log file
-        for (int i = 0; i < this.numOfPlayers; i++) {
-            this.decks[i].logFinalDeckContents(this.logDirectory);
+        for (Deck deck : this.decks) {
+            deck.logFinalDeckContents(this.logDirectory);
         }
     }
 
@@ -285,7 +286,7 @@ public class CardGame {
     private void setUpLogFileDirectory() {
         try {
             // Create an empty directory for log output files
-            Files.createDirectories(Paths.get(this.logDirectory));
+            Files.createDirectories(this.logDirectory);
 
         } catch (IOException e) {
             out.println("ERROR: Cannot create directory for log files.");
@@ -298,7 +299,7 @@ public class CardGame {
      */
     private class PlayerGameController implements GameController {
         @Override
-        public String getLogDirectory() {
+        public Path getLogDirectory() {
             return logDirectory;
         }
 

@@ -2,6 +2,7 @@ package card_playing_sim;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Holds a fixed amount of {@link Card}s and utilises a queue structure (FIFO) for taking and discarding cards.
@@ -131,8 +132,9 @@ class Deck {
      * Writes this deck's final contents to its log file at the end of the game.
      * @param logDirectory The string of the directory path to log to
      */
-    void logFinalDeckContents(String logDirectory) {
-        String logFilePath = String.format("%sdeck%d_output.txt", logDirectory, this.deckValue);
+    void logFinalDeckContents(Path logDirectory) {
+        String logFilePath = logDirectory.resolve(
+                String.format("deck%d_output.txt", this.deckValue)).toString();
 
         // Append flag is false, by default, because we want a fresh deck log file each game
         try (FileWriter fw = new FileWriter(logFilePath)) {

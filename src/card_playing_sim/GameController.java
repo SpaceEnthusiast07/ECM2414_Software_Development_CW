@@ -1,5 +1,7 @@
 package card_playing_sim;
 
+import java.nio.file.Path;
+
 // TODO: Add Javadoc class description
 public interface GameController {
     /**
@@ -10,10 +12,10 @@ public interface GameController {
     boolean declareWinner(int playerValue);
 
     /**
-     * Gets the string log file directory (defaults to DEFAULT_LOG_DIRECTORY)
-     * @return A String log file directory
+     * Gets the log file directory Path (defaults to DEFAULT_LOG_DIRECTORY)
+     * @return The directory Path that player log files are written to
      */
-    String getLogDirectory();
+    Path getLogDirectory();
 
     /**
      * Checks if a winning player has been set yet

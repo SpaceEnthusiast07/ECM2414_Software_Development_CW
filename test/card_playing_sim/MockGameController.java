@@ -1,15 +1,17 @@
 package card_playing_sim;
 
+import java.nio.file.Path;
+
 public class MockGameController implements GameController {
-    private final String logDirectory;
+    private final Path logDirectory;
     private int winningPlayerValue = 0;
 
-    MockGameController(String logDirectory) {
+    MockGameController(Path logDirectory) {
         this.logDirectory = logDirectory;
     }
 
     @Override
-    public String getLogDirectory() {
+    public Path getLogDirectory() {
         return this.logDirectory;
     }
 
