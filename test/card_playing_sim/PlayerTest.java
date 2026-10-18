@@ -1,13 +1,57 @@
 package card_playing_sim;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
+    // Mock object to control player interaction with mock game state during tests
     private MockGameController mockGameController;
-    // TODO: Create BeforeEach AfterEach for setting and cleaning up the mockGameController
-    // TODO: Setup tempdir for log file directory
+
+    // Temporary directory where test logfiles are sent to
+    private Path logDir;
+
+    /**
+     * Before each test, create a unique temporary directory for log files
+     * and creates a fresh mock game controller object with that directory
+     * @throws IOException If temp directory creation fails
+     */
+    @BeforeEach
+    void setUpControllerAndLogDir() throws IOException {
+        // Create temporary logfile directory
+        logDir = Files.createTempDirectory("cardgame_test");
+        // Instantiate a new mock game controller instance
+        mockGameController = new MockGameController(logDir);
+    }
+
+    /**
+     * After each test, reset the mock game controller object to null
+     * and then delete every file in the temp directory, before deleting the directory itself
+     * Prevents any test data in log files or game state remaining between tests
+     * @throws IOException If file/directory deletion fails
+     */
+    @AfterEach
+    void cleanUpControllerAndLogDir() throws IOException {
+        // Force null the mock game controller
+        mockGameController = null;
+
+        // List all file in the log folder using a stream and delete each one
+        try (Stream<Path> files = Files.list(logDir)) {
+            for (Path file : files.toList()) {
+                Files.delete(file);
+            }
+        }
+        // Then delete the directory itself
+        Files.delete(logDir);
+    }
 
     /**
      * Utility to create a player holding a hand of the given card values
@@ -16,7 +60,7 @@ public class PlayerTest {
      * @return The created player with it's created hand of cards
      */
     private Player createPlayerWithHand(int[] values, int playerValue) {
-        Player player = new Player(playerValue, mockGameController);
+        Player player = new Player(playerValue, this.mockGameController);
 
         // Create and give cards to player hand in order, using values
         for (int val : values) {
@@ -38,8 +82,6 @@ public class PlayerTest {
     @DisplayName("TEST: Giving to a player's full hand throws")
     @Test
     void giveCardToFullHandThrows() {
-        // Create a fresh mock game controller for player interaction
-        this.mockGameController = new MockGameController("testing_logs/");
 
         // Create a player with an initial full hand of 4 cards
         int[] initialCardVals = {1,5,2,7};
