@@ -28,13 +28,11 @@ public class CardGameTest {
         // Temporary directory where test logfiles are sent to
         private Path logDir;
 
-        private final String PROGRAM_TITLE_MESSAGE = """
-                                                    === ECM2414 Software Development Coursework ===
-                                                    Multithreaded Card Playing Sim
-                                                    """;
+        private final String PROGRAM_TITLE_MESSAGE = "=== ECM2414 Software Development Coursework ===";
+        private final String PROGRAM_SUBTITLE_MESSAGE = "\nMultithreaded Card Playing Sim";
         private final String PLEASE_ENTER_PLAYER_NUMBER_MESSAGE = "Please enter the number of players: ";
-        private final String PLAYER_NUM_GREATER_THAN_ONE_ERROR = "ERROR: Number of players must be an Integer greater than 1.\n";
-        private final String PLAYER_NUM_NO_INPUT_ERROR = "ERROR: Please enter a number of players.\n";
+        private final String PLAYER_NUM_GREATER_THAN_ONE_ERROR = "ERROR: Number of players must be an Integer greater than 1.";
+        private final String PLAYER_NUM_NO_INPUT_ERROR = "ERROR: Please enter a number of players.";
 
         /**
          * Runs the CardGame as a mock game using streams instead of console
@@ -106,23 +104,30 @@ public class CardGameTest {
         @Test
         void invalidPlayerCountReprompt() {
             // Create 4 input cases for different scenarios
-            String[] invalidPlayerCounts = {"five",  // Invalid Input (not int)
-                                            "1",   // Invalid Input (not >1)
-                                            "-5",  // Invalid Input (negative)
-                                            " "};   // No Input
+            String[] invalidPlayerCounts = {
+                "five",  // Invalid Input (not int)
+                "1",     // Invalid Input (not >1)
+                "-5",    // Invalid Input (negative)
+                " "      // No Input
+            };
+
+            String[] expectedOutputs = {
+                    PROGRAM_TITLE_MESSAGE + PROGRAM_SUBTITLE_MESSAGE,
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR,
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR,
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR,
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_NO_INPUT_ERROR
+            };
 
             // Run the program until error and return the string output from PrintStream
             String output = getOutput(invalidPlayerCounts);
 
-            // Expected messages and errors given our input cases:
-            String expectedOutput = PROGRAM_TITLE_MESSAGE + "\n" +
-                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
-                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
-                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
-                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_NO_INPUT_ERROR;
+            String[] outputs = output.split("\n\n");
 
-            // Check if these match the actual game outputs
-            assertEquals(expectedOutput, output);
+            assertEquals(expectedOutputs[0], outputs[0]);
+            assertEquals(expectedOutputs[1], outputs[1]);
+            assertEquals(expectedOutputs[2], outputs[2]);
+            assertEquals(expectedOutputs[3], outputs[3]);
         }
 
         @Test
