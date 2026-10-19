@@ -95,20 +95,11 @@ public class CardGame {
     void startSim() {
         out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
 
-        // Used to input numOfPlayers and packFilePath
-        Scanner sc = new Scanner(in);
-
-        // Ask the user to input the number of players
-        this.inputNumberOfPlayers(sc);
-
-        // Asks the user for the path to a pack file and validates it
-        this.inputPackFileName(sc);
-
-        // Close the input stream
-        sc.close();
-
         // Set up the log file directory
         this.setUpLogFileDirectory();
+
+        // Repeatedly prompt user for number of players and pack file until both are valid
+        this.readUserInput();
 
         // Create an array of players with unique values
         this.players = new Player[this.numOfPlayers];
@@ -159,6 +150,24 @@ public class CardGame {
         for (Thread thread : this.threads) {
             thread.start();
         }
+    }
+
+    /**
+     * Repeatedly prompt the user for the number of players and pack file until both are valid
+     */
+    void readUserInput() {
+        // Used to input numOfPlayers and packFilePath
+        Scanner sc = new Scanner(in);
+
+        // Ask the user to input the number of players
+        this.inputNumberOfPlayers(sc);
+
+        // Asks the user for the path to a pack file and validates it
+        this.inputPackFileName(sc);
+
+        // Close the input stream
+        sc.close();
+
     }
 
     /**
