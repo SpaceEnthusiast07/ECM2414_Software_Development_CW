@@ -22,14 +22,50 @@ public class CardGameTest {
 
     @Nested
     class InputPromptTests {
+        // Mock object to control player interaction with mock game state during tests
         private MockGameController mockGameController;
+
+        // Temporary directory where test logfiles are sent to
         private Path logDir;
 
-        private final String PROGRAM_TITLE_MESSAGE = "=== ECM2414 Software Development Coursework ===\n" +
-                "Multithreaded Card Playing Sim\n";
+        private final String PROGRAM_TITLE_MESSAGE = """
+                                                    === ECM2414 Software Development Coursework ===
+                                                    Multithreaded Card Playing Sim
+                                                    """;
         private final String PLEASE_ENTER_PLAYER_NUMBER_MESSAGE = "Please enter the number of players: ";
         private final String PLAYER_NUM_GREATER_THAN_ONE_ERROR = "ERROR: Number of players must be an Integer greater than 1.\n";
         private final String PLAYER_NUM_NO_INPUT_ERROR = "ERROR: Please enter a number of players.\n";
+
+        /**
+         * Runs the CardGame as a mock game using streams instead of console
+         * Completes on hitting NoSuchElementException
+         * @param inputString String of inputs to be streamed, separated by newlines "/n"
+         * @return The buffered output as a String from runtime to exception, separated by newlines "\n"
+         */
+        private String getOutput(String inputString) {
+            // Convert the inputString to a byte array input stream (using UTF-8 formatting)
+            InputStream playerCountsAsStream = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
+
+            // Create a response stream and buffer from the PrintStream output (using UTF-8 formatting)
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            PrintStream responses = new PrintStream(buffer, true, StandardCharsets.UTF_8);
+
+            // Create a mock card game, using the streams instead of console
+            CardGame MockGameState = new CardGame(playerCountsAsStream, responses, this.logDir);
+
+            // Run the program until NoSuchElementException (when no more responses to process)
+            try {
+                MockGameState.startSim();
+            } catch (NoSuchElementException e) {
+                //
+            }
+
+            // Now game's finished, flush the response stream to the buffer
+            responses.flush();
+
+            // Return the buffer as a string (using UTF-8 formatting)
+            return buffer.toString(StandardCharsets.UTF_8);
+        }
 
         /**
          * Before each test, create a unique temporary directory for log files
@@ -67,33 +103,23 @@ public class CardGameTest {
 
         @Test
         void invalidPlayerCountReprompt() {
+            // Create 4 input cases for different scenarios
             String invalidPlayerCounts = "five"   // Invalid Input (not int)
                                         + "\n1"   // Invalid Input (not >1)
                                         + "\n-5"  // Invalid Input (negative)
                                         + "\n";   // No Input
 
-            InputStream playerCountsAsStream = new ByteArrayInputStream(invalidPlayerCounts.getBytes(StandardCharsets.UTF_8));
+            // Run the program until error and return the string output from PrintStream
+            String output = getOutput(invalidPlayerCounts);
 
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            PrintStream responses = new PrintStream(buffer, true, StandardCharsets.UTF_8);
-
-            CardGame MockGameState = new CardGame(playerCountsAsStream, responses, this.logDir);
-
-            try {
-                MockGameState.startSim();
-            } catch (NoSuchElementException e) {
-                //
-            }
-
-            responses.flush();
-
-            String output = buffer.toString(StandardCharsets.UTF_8);
-
+            // Expected messages and erros given our input cases:
             String expectedOutput = PROGRAM_TITLE_MESSAGE + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_NO_INPUT_ERROR;
+
+            // Check if these match the actual game outputs
             assertEquals(expectedOutput, output);
         }
 
