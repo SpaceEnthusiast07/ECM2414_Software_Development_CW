@@ -8,7 +8,7 @@ import java.util.Random;
  * Contains all the logic for a player's game strategy as well as the logging of a player's every move and
  * which player won at the end of the game.
  * <br>
- *  - To create a new Player, the player's value and a reference to the main program object must be passed in.
+ *  - To create a new Player, the player's value and a reference to the main game controller object must be passed in.
  * <br>
  *  - {@link #run()} is called automatically once {@link Thread#start()} is called and contains the player's card logic.
  * <br>
@@ -44,7 +44,7 @@ class Player implements Runnable {
     /**
      * Initialises a new Player.
      * @param playerValue An Integer value for this player, i.e. 1 for player1, 2 for player2, etc.
-     * @param playerGamecontroller Reference to main game controller used to check and mutate game state
+     * @param playerGamecontroller Reference to main game controller used to check and mutate game state.
      */
     Player(int playerValue, GameController playerGamecontroller) {
         this.PLAYER_VALUE = playerValue;
@@ -219,14 +219,14 @@ class Player implements Runnable {
         // Append logs to end of log file
         try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
             if (winningPlayer == this.PLAYER_VALUE) {
-                // Write which player has won to log file
+                // Log that this player has won the game
                 fw.write(String.format("player %d wins\n", winningPlayer));
                 // Log that this player has exited the game; e.g., "player1 exits"
                 fw.write(String.format("player %d exits\n", this.PLAYER_VALUE));
                 // Log this player's final hand
                 fw.write(String.format("player %d final hand: %s\n", this.PLAYER_VALUE, thisPlayersHand));
             } else {
-                // Write which player has won to log file
+                // Log which player won the game
                 fw.write(String.format("player %d has informed player %d that player %d has won\n",
                         winningPlayer, this.PLAYER_VALUE, winningPlayer));
                 // Log that this player has exited the game; e.g., "player1 exits"

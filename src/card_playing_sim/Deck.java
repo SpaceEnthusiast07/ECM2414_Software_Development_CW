@@ -7,7 +7,7 @@ import java.nio.file.Path;
 /**
  * Holds a fixed amount of {@link Card}s and utilises a queue structure (FIFO) for taking and discarding cards.
  * <br>
- *  - To create a new Deck, simply pass in its value.
+ *  - To create a new Deck, simply pass in its value to the constructor.
  * <br>
  *  - To discard a card to the bottom of the deck, call {@link #discardToDeck(Card newCard)}.
  * <br>
@@ -17,7 +17,7 @@ import java.nio.file.Path;
  */
 class Deck {
     // Array of cards in deck
-    private Card[] cards;
+    private volatile Card[] cards;
 
     // Holds this deck's value
     private final int deckValue;

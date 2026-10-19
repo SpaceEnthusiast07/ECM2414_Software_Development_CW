@@ -16,8 +16,8 @@ import java.util.Scanner;
  *  - To add a card, call {@link #addCardToBottom(Card newCard)}, providing the new card to add; an exception is thrown
  * when the pack is full.
  * <br>
- *  - To take a card from the top of the pack, call {@link #takeTopCard()}, which returns the top card, as a Card object.
- * If the pack doesn't contain any cards, an exception is thrown.
+ *  - To take a card from the top of the pack, call {@link #takeTopCard()}, which returns the top card, as a
+ *  {@link Card} object. If the pack doesn't contain any cards, an exception is thrown.
  * <br>
  *  - This Pack class is thread-confined, so doesn't implement any thread-safe aspects.
  */
@@ -110,7 +110,7 @@ class Pack {
         // Declare variable to hold card value
         int cardValue;
 
-        // Tracks number of cards for each player
+        // Tracks the number of cards of each player's preferred value
         int[] playerCardCountTracker = new int[numOfPlayers];
 
         // Keeps track of the number of cards in the pack file
@@ -123,6 +123,7 @@ class Pack {
             // Loop through each line in the pack file
             while (sc.hasNext()) {
                 cardValue = sc.nextInt();
+
                 // Ensure card value is positive
                 if (cardValue < 1) {
                     throw new InvalidPackFileException("ERROR: Pack file must only contain positive card values.");
@@ -149,8 +150,8 @@ class Pack {
             }
 
             // Ensure there are at least 4 cards of each player's preference
-            for (int i = 0; i < playerCardCountTracker.length; i++) {
-                if (playerCardCountTracker[i] < 4) {
+            for (int j : playerCardCountTracker) {
+                if (j < 4) {
                     throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 of each " +
                             "player's preferred card.");
                 }

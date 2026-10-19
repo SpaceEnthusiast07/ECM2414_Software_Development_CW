@@ -14,11 +14,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: Add Javadoc class description
+/**
+ * Hosts all central game simulation logic.
+ * <br>
+ *  - To create a new game, simply call the constructor with no arguments to create a default simulation.
+ * <br>
+ *  - You can also create a new simulation by specifying the input and output streams, and a custom log file
+ *  directory to the constructor.
+ * <br>
+ *  - To manually start the simulation, call {@link #startSim()}.
+ * <br>
+ *  - {@link #startSim()} contains terminal output for title, questions, and error messages; and terminal input for
+ *  the number of players in the game and the path to a pack file to load.
+ */
 public class CardGame {
     // Stores the number of cards in a player's hand
     static final int NUM_CARDS_IN_HAND = 4;
-    // Stores the number of cards in a player's hand
+    // Stores the number of cards in a deck
     static final int NUM_CARDS_IN_DECK = 4;
     // Stores the string directory name of where log files are stored to
     static final Path DEFAULT_LOG_DIRECTORY = Paths.get("card_playing_sim_log_files");
@@ -41,27 +53,27 @@ public class CardGame {
     // Holds all the decks in the game
     private Deck[] decks;
 
-    // Holds value of the winning player (0 = no winner yet) atomically
+    // Holds value of winning player (0 = no winner yet) atomically
     private final AtomicInteger winningPlayerValue = new AtomicInteger(0);
     // Holds number of players (threads) currently running atomically
     // Therefore, last finishing player can safely call all decks to be logged, as all other player's finished
     private final AtomicInteger numPlayersRunning = new AtomicInteger(0);
 
-    // Encapsulated game interaction logic handed only to player's
+    // Encapsulated game interaction logic, handed only to players
     private final GameController playerGameController = new PlayerGameController();
 
     /**
-     * Default constructor (uses console and default log directory)
+     * Default constructor (uses console and default log directory).
      */
     public CardGame() {
         this(System.in, System.out, DEFAULT_LOG_DIRECTORY);
     }
 
     /**
-     * Constructor with custom in and out streams, and logDirectory
-     * @param in An InputStream (e.g. System.in)
-     * @param out A PrintStream (e.g. System.out)
-     * @param logDirectory A custom logDirectory String path for storing program log files
+     * Constructor with custom in and out streams, and logDirectory.
+     * @param in An InputStream (e.g. System.in).
+     * @param out A PrintStream (e.g. System.out).
+     * @param logDirectory A custom logDirectory, as a {@link Path} object, for storing program log files.
      */
     CardGame(InputStream in, PrintStream out, Path logDirectory) {
         this.in = in;
@@ -89,7 +101,7 @@ public class CardGame {
         // Ask the user to input the number of players
         this.inputNumberOfPlayers(sc);
 
-        // Ack the user to input the name for the pack file and validates it
+        // Asks the user for the path to a pack file and validates it
         this.inputPackFileName(sc);
 
         // Close the input stream
@@ -258,14 +270,14 @@ public class CardGame {
      */
     void assignDecksToPlayers() {
         // Iterate through each player
-        for (int i = 0; i < numOfPlayers; i++) {
+        for (int i = 0; i < this.numOfPlayers; i++) {
             // Left deck is deck i for player i
-            players[i].setLeftDeck(decks[i]);
+            this.players[i].setLeftDeck(this.decks[i]);
             // Right deck is i+1 for player i
-            if (i+1 == decks.length) {
-                players[i].setRightDeck(decks[0]);
+            if (i+1 == this.decks.length) {
+                this.players[i].setRightDeck(this.decks[0]);
             } else {
-                players[i].setRightDeck(decks[i+1]);
+                this.players[i].setRightDeck(this.decks[i+1]);
             }
         }
     }
@@ -294,7 +306,8 @@ public class CardGame {
     }
 
     /**
-     * Holds player interaction logic with game state, passed to each {@link Player}
+     * Holds player interaction logic with game state, passed to each {@link Player}.
+     * <br>
      * Kept private so only players can declare winner or report exiting
      */
     private class PlayerGameController implements GameController {
