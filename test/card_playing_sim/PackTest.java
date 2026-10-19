@@ -36,7 +36,7 @@ public class PackTest {
         return new Pack(cards);
     }
 
-    @DisplayName("TEST: Adding and taking from pack")
+    @DisplayName("Adding and taking from pack")
     @Test
     void takeTopCardReturnsCardsInOrderAdded() {
         // Create empty pack of fixed-length 8 (8*1)
@@ -58,7 +58,7 @@ public class PackTest {
         assertEquals(4, myPack.takeTopCard().value());
     }
 
-    @DisplayName("TEST: Taking from an empty pack throws")
+    @DisplayName("Taking from an empty pack throws")
     @Test
     void takeFromEmptyPackThrows() {
         // Create an empty pack
@@ -68,7 +68,7 @@ public class PackTest {
         assertThrows(InvalidOperationException.class, () -> emptyPack.takeTopCard() );
     }
 
-    @DisplayName("TEST: Adding to a full pack throws")
+    @DisplayName("Adding to a full pack throws")
     @Test
     void addToFullPackThrows() {
         // Create a pack with an initial 5 cards

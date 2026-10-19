@@ -45,7 +45,7 @@ public class DeckTest {
         assertEquals(myNumber, myDeck.getDeckValue());
     }
 
-    @DisplayName("TEST: Discarding and taking from deck in FIFO order")
+    @DisplayName("Discarding and taking from deck in FIFO order")
     @Test
     void takeCardsReturnsInOrderDiscarded() {
         // Create 3 cards of different values (1,3,2)
@@ -71,7 +71,7 @@ public class DeckTest {
         assertEquals(card1.value(), deck.takeFromDeck().value());
     }
 
-    @DisplayName("TEST: Taking from an empty deck throws")
+    @DisplayName("Taking from an empty deck throws")
     @Test
     void takeFromEmptyDeckThrows() {
         // Create an empty deck
@@ -81,7 +81,7 @@ public class DeckTest {
         assertThrows(InvalidOperationException.class, () -> emptyDeck.takeFromDeck() );
     }
 
-    @DisplayName("TEST: Discarding to a full deck throws")
+    @DisplayName("Discarding to a full deck throws")
     @Test
     void discardToFullDeckThrows() {
         // Create a full deck with an initial 5 cards

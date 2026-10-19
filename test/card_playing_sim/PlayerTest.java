@@ -79,7 +79,7 @@ public class PlayerTest {
         return createPlayerWithHand(values, 1);
     }
 
-    @DisplayName("TEST: Giving to a player's full hand throws")
+    @DisplayName("Giving to a player's full hand throws")
     @Test
     void giveCardToFullHandThrows() {
 

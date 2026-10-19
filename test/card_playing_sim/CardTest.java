@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CardTest {
 
     // TODO: Consider deleting as low value - just a record
-    @DisplayName("TEST: Get card value")
+    @DisplayName("Get card value")
     @Test
     void getCardValue() {
         // Create a card with value 5
