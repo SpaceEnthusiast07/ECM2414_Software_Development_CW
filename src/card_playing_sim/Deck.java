@@ -25,6 +25,9 @@ class Deck {
     // Holds the max number of cards in a deck
     private static final int MAX_CARDS_IN_DECK = 1 + CardGame.NUM_CARDS_IN_DECK;
 
+    // Flag to indicate whether this deck is locked; i.e., being used by another player
+    private boolean isLocked = false;
+
     // Points to the next AVAILABLE space in the deck
     private int back;
 
@@ -147,5 +150,27 @@ class Deck {
             System.out.printf("ERROR: Failed to write final deck contents to log file \"%s\" for deck%d\n",
                     logFilePath, this.deckValue);
         }
+    }
+
+    /**
+     * Locks this deck to one player when it is performing its atomic take-discard operation.
+     */
+    void lock() {
+        this.isLocked = true;
+    }
+
+    /**
+     * Unlocks this deck once a player has finished its atomic take-discard operation.
+     */
+    void unlock() {
+        this.isLocked = false;
+    }
+
+    /**
+     * Determines if another player is currently using this deck in its atomic take-discard operation.
+     * @return True if this deck is NOT locked, otherwise false.
+     */
+    boolean isNotLocked() {
+        return !this.isLocked;
     }
 }

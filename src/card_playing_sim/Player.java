@@ -78,8 +78,14 @@ class Player implements Runnable {
                 }
                 break;
             }
-            // Check whether this player can take and discard a card to its left and right deck respectively
-            else if (this.leftDeck.canTakeFromDeck() && this.rightDeck.canDiscardToDeck()) {
+            // Checks whether either deck is not locked and if this player can take or discard to is left
+            // and right decks respectively.
+            else if (this.leftDeck.isNotLocked() && this.rightDeck.isNotLocked() &&
+                    this.leftDeck.canTakeFromDeck() && this.rightDeck.canDiscardToDeck()) {
+                // Lock both decks for this player's atomic take-discard operation
+                this.leftDeck.lock();
+                this.rightDeck.lock();
+
                 // Output everything this player does to its own log file
                 // Append flag is true because we want to add more information to the log file rather than overwrite it
                 try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
@@ -114,6 +120,10 @@ class Player implements Runnable {
                 } catch (InvalidOperationException e) {
                     System.out.println(e.getMessage());
                 }
+
+                // Unlocking the decks ready for another player to use them
+                this.leftDeck.unlock();
+                this.rightDeck.unlock();
             }
         }
 
