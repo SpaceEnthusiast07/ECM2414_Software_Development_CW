@@ -39,10 +39,12 @@ public class CardGameTest {
         /**
          * Runs the CardGame as a mock game using streams instead of console
          * Completes on hitting NoSuchElementException
-         * @param inputString String of inputs to be streamed, separated by newlines "/n"
+         * @param inputs String array of inputs to be streamed, line by line
          * @return The buffered output as a String from runtime to exception, separated by newlines "\n"
          */
-        private String getOutput(String inputString) {
+        private String getOutput(String[] inputs) {
+            String inputString = String.join("\n", inputs);
+
             // Convert the inputString to a byte array input stream (using UTF-8 formatting)
             InputStream playerCountsAsStream = new ByteArrayInputStream(inputString.getBytes(StandardCharsets.UTF_8));
 
@@ -104,15 +106,15 @@ public class CardGameTest {
         @Test
         void invalidPlayerCountReprompt() {
             // Create 4 input cases for different scenarios
-            String invalidPlayerCounts = "five"   // Invalid Input (not int)
-                                        + "\n1"   // Invalid Input (not >1)
-                                        + "\n-5"  // Invalid Input (negative)
-                                        + "\n";   // No Input
+            String[] invalidPlayerCounts = {"five",  // Invalid Input (not int)
+                                            "1",   // Invalid Input (not >1)
+                                            "-5",  // Invalid Input (negative)
+                                            " "};   // No Input
 
             // Run the program until error and return the string output from PrintStream
             String output = getOutput(invalidPlayerCounts);
 
-            // Expected messages and erros given our input cases:
+            // Expected messages and errors given our input cases:
             String expectedOutput = PROGRAM_TITLE_MESSAGE + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_GREATER_THAN_ONE_ERROR + "\n" +
