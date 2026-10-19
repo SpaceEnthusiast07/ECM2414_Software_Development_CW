@@ -38,9 +38,9 @@ public class CardGameTest {
          * Runs the CardGame as a mock game using streams instead of console
          * Completes on hitting NoSuchElementException
          * @param inputs String array of inputs to be streamed, line by line
-         * @return The buffered output as a String from runtime to exception, separated by newlines "\n"
+         * @return The buffered outputs as a String array from runtime to exception, separated by double newlines "\n\n"
          */
-        private String getOutput(String[] inputs) {
+        private String[] getOutputs(String[] inputs) {
             String inputString = String.join("\n", inputs);
 
             // Convert the inputString to a byte array input stream (using UTF-8 formatting)
@@ -63,8 +63,11 @@ public class CardGameTest {
             // Now game's finished, flush the response stream to the buffer
             responses.flush();
 
-            // Return the buffer as a string (using UTF-8 formatting)
-            return buffer.toString(StandardCharsets.UTF_8);
+            // Get the buffer as a string array (using UTF-8 formatting)
+            String outputString = buffer.toString(StandardCharsets.UTF_8);
+
+            // Split the output into string elements by double newline (and ignore last newline)
+            return outputString.stripTrailing().split("\n\n");
         }
 
         /**
@@ -119,15 +122,11 @@ public class CardGameTest {
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + PLAYER_NUM_NO_INPUT_ERROR
             };
 
-            // Run the program until error and return the string output from PrintStream
-            String output = getOutput(invalidPlayerCounts);
+            // Run the program until error and return the string outputs from PrintStream
+            String[] actualOutputs = getOutputs(invalidPlayerCounts);
 
-            String[] outputs = output.split("\n\n");
-
-            assertEquals(expectedOutputs[0], outputs[0]);
-            assertEquals(expectedOutputs[1], outputs[1]);
-            assertEquals(expectedOutputs[2], outputs[2]);
-            assertEquals(expectedOutputs[3], outputs[3]);
+            // Check all values in expected outputs are equal to all values in actual outputs
+            assertArrayEquals(expectedOutputs, actualOutputs);
         }
 
         @Test
