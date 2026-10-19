@@ -56,7 +56,7 @@ public class CardGameTest {
             responses.flush();
 
             // Get the buffer as a string array (using UTF-8 formatting)
-            String outputString = buffer.toString(StandardCharsets.UTF_8);
+            String outputString = buffer.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");;
 
             // Split the output into string elements by double newline (and ignore leading newline)
             return outputString.stripLeading().split("\n\n");
