@@ -149,5 +149,22 @@ public class DeckTest {
             assertArrayEquals(expectedLog, readDeckOneLog());
         }
 
+        @DisplayName("An empty deck is logged with no card values")
+        @Test
+        void emptyDeckLogFormat() throws IOException {
+            // Create empty deck
+            Deck deck = createDeckWithCardValues(new int[] {});
+
+            // Log Deck contents
+            deck.logFinalDeckContents(this.tempDir);
+
+            String[] expectedLog = {
+                    "deck1 contents:"
+            };
+
+            // Check deck log matches empty hand
+            assertArrayEquals(expectedLog, readDeckOneLog());
+        }
+
     }
 }
