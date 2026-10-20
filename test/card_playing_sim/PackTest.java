@@ -1,7 +1,12 @@
 package card_playing_sim;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -36,58 +41,135 @@ public class PackTest {
         return new Pack(cards);
     }
 
-    @DisplayName("Adding and taking from pack")
-    @Test
-    void takeTopCardReturnsCardsInOrderAdded() {
-        // Create empty pack of fixed-length 8 (8*1)
-        Pack myPack = new Pack(1);
+    @Nested
+    class DeckActionTests {
+        @DisplayName("Adding and taking from pack")
+        @Test
+        void takeTopCardReturnsCardsInOrderAdded() {
+            // Create empty pack of fixed-length 8 (8*1)
+            Pack myPack = new Pack(1);
 
-        // Create 3 cards of different values (4,9,7) - added manually for clearer reading
-        Card card1 = new Card(4);
-        Card card2 = new Card(9);
-        Card card3 = new Card(7);
+            // Create 3 cards of different values (4,9,7) - added manually for clearer reading
+            Card card1 = new Card(4);
+            Card card2 = new Card(9);
+            Card card3 = new Card(7);
 
-        // Insert cards sequentially at bottom of pack
-        myPack.addCardToBottom(card2);
-        myPack.addCardToBottom(card3);
-        myPack.addCardToBottom(card1);
+            // Insert cards sequentially at bottom of pack
+            myPack.addCardToBottom(card2);
+            myPack.addCardToBottom(card3);
+            myPack.addCardToBottom(card1);
 
-        // Take the cards off the top and check they are same order added in
-        assertEquals(9, myPack.takeTopCard().value());
-        assertEquals(7, myPack.takeTopCard().value());
-        assertEquals(4, myPack.takeTopCard().value());
+            // Take the cards off the top and check they are same order added in
+            assertEquals(9, myPack.takeTopCard().value());
+            assertEquals(7, myPack.takeTopCard().value());
+            assertEquals(4, myPack.takeTopCard().value());
+        }
+
+        @DisplayName("Taking from an empty pack throws")
+        @Test
+        void takeFromEmptyPackThrows() {
+            // Create an empty pack
+            Pack emptyPack = new Pack(1);
+
+            //Take from empty pack and check if errors InvalidOperationException
+            assertThrows(InvalidOperationException.class, () -> emptyPack.takeTopCard() );
+        }
+
+        @DisplayName("Adding to a full pack throws")
+        @Test
+        void addToFullPackThrows() {
+            // Create a pack with an initial 5 cards
+            int[] initialCardVals = {3,2,5,2,1};
+            Pack pack = createPackWithCards(initialCardVals);
+
+            // Create an additional card
+            Card extraCard = new Card(5);
+
+            //Add 6th card to full pack and check if errors InvalidOperationException
+            assertThrows(InvalidOperationException.class, () -> pack.addCardToBottom(extraCard) );
+        }
     }
 
-    @DisplayName("Taking from an empty pack throws")
-    @Test
-    void takeFromEmptyPackThrows() {
-        // Create an empty pack
-        Pack emptyPack = new Pack(1);
+    @Nested
+    class ReadingPackFileTests {
+        // Number of players used in every test for consistency
+        private final int NUM_PLAYERS = 4;
 
-        //Take from empty pack and check if errors InvalidOperationException
-        assertThrows(InvalidOperationException.class, () -> emptyPack.takeTopCard() );
-    }
+        // Expected error messages from readPackFile()
+        private static final String NEGATIVE_VALUE_ERROR = "ERROR: Pack file must only contain non-negative card values.";
+        private static final String NOT_INTEGER_ERROR = "ERROR: At least 1 card value in the provided pack is not an Integer.";
+        private static final String TOO_SHORT_ERROR = "ERROR: Pack file is too short, must contain exactly 8n cards.";
+        private static final String TOO_MANY_ERROR = "ERROR: Pack file contains too many cards, must contain exactly 8n cards.";
+        private static final String FILE_NOT_EXIST_ERROR = "ERROR: Pack file does not exist.";
 
-    @DisplayName("Adding to a full pack throws")
-    @Test
-    void addToFullPackThrows() {
-        // Create a pack with an initial 5 cards
-        int[] initialCardVals = {3,2,5,2,1};
-        Pack pack = createPackWithCards(initialCardVals);
+        // Temporary isolated directory to store files in for each individual test fresh
+        private Path tempDir;
 
-        // Create an additional card
-        Card extraCard = new Card(5);
+        /**
+         * Before each test, create a unique temporary directory for files
+         * @throws IOException If temp directory or pack file creation fails
+         */
+        @BeforeEach
+        void setUpTempDirAndPackFile() throws IOException {
+            this.tempDir = Files.createTempDirectory("readingPackFileTests_");
+        }
 
-        //Add 6th card to full pack and check if errors InvalidOperationException
-        assertThrows(InvalidOperationException.class, () -> pack.addCardToBottom(extraCard) );
-    }
+        /**
+         * After each test, delete every file in temporary directory and the directory itself
+         * Prevents any test data in log files or game state remaining between tests
+         * @throws IOException If file/directory deletion fails
+         */
+        @AfterEach
+        void cleanUpTempDir() throws IOException {
+            // List all file in the log folder using a stream and delete each one
+            try (Stream<Path> files = Files.list(this.tempDir)) {
+                for (Path file : files.toList()) {
+                    Files.delete(file);
+                }
+            }
+            Files.delete(this.tempDir);
+        }
 
-    // TODO: Tests for reading pack files
-        // TODO: packLoadsAllCardsInFileOrder
+        /**
+         * A copy of a guaranteed valid 32-card pack for 4 players
+         * Possible for all players 1-4 to win with a full hand of their preferred card
+         * Test operate on same valid pack file for consistency
+         * @return All pack lines, top of pack first
+         */
+        private String[] validLines() {
+            return new String[] {
+                    "1", "2", "1", "5", "9", "4", "3", "2",
+                    "2", "1", "3", "5", "4", "7", "8", "4",
+                    "7", "8", "3", "9", "5", "5", "6", "6",
+                    "9", "4", "3", "7", "7", "2", "1", "3"
+            };
+        }
+
+        @DisplayName("Valid pack loads exactly 8n cards in file order")
+        @Test
+        void validPackLoadsAllCardsInFileOrder() throws IOException {
+            // Create a guaranteed valid pack file and write to file
+            String[] lines = validLines();
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+
+            // Read that packFile using readPackFile
+            Pack pack = Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS);
+
+            // For each line we wrote, check that it is the same line taken from top of pack (FIFO order)
+            for (String line : lines) {
+                assertEquals(Integer.parseInt(line), pack.takeTopCard().value());
+            }
+
+            // After checking all lines inputted, check there are no extra cards left in pack
+            assertThrows(InvalidOperationException.class, () -> pack.takeTopCard());
+
+        }
+
         // TODO: packWithNonIntThrows
         // TODO: packWithTrailingNewlineIsValid
         // TODO: missingPackFileThrows
         // TODO: packContainsNegativesThrows
         // TODO: packFileWithLength (parameterised? too short, too long, exactly right)
         // TODO: packFileWithoutWinningHand
+    }
 }
