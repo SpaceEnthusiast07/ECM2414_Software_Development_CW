@@ -223,13 +223,9 @@ public class CardGameTest {
         /**
          * Runs a complete game, failing if it takes over 10 seconds
          * @param numPlayers The number of players, n
-         * @param packLines The pack file lines in order
          * @throws IOException If the pack file can't be written
          */
-        private void runGame(int numPlayers, String[] packLines) throws IOException {
-            // Create a pack file with given card value lines
-            Path packFile = TestUtils.writePackFile(this.tempDir, "pack.txt", packLines);
-
+        private void runGame(int numPlayers, Path packFile) throws IOException {
             // Answer the two prompts: number of players and pack file location
             String input = numPlayers + "\n" + packFile + "\n";
 
@@ -287,7 +283,9 @@ public class CardGameTest {
                 "34", "35", "36", "37", "38", "39", "40", "41"
             };
 
-            runGame(4, pack);
+            Path packFile = TestUtils.writePackFile(this.tempDir, "pack.txt", pack);
+
+            runGame(4, packFile);
 
             String[] expectedWinnerLog = {
                     "player 2 initial hand 2 2 2 2",
@@ -313,23 +311,58 @@ public class CardGameTest {
             assertArrayEquals(deck1ExpectedLog, readLog("deck1_output.txt"));
         }
 
-        @DisplayName("Random games end with one winner, 4-card hands, no cards lost")
+        @DisplayName("Fixed pack games end with one winner, 4-card hands, no cards lost")
         @RepeatedTest(20) // Use the same pack each time but thread timing and random discards make games different
-        void randomGameInvariants() throws IOException {
+        void fixedPackGameInvariants() throws IOException {
             final int NUM_PLAYERS = 4;
-            final int DISCARDED_INDEX_IN_LOGSTRING = 4;
-            final int HAND_CARDS_FROMWORD_INDEX = 5;
-
             // 8 of each value 1 to 4 (with no immediate winning hands)
             String[] pack = {
-            "1", "2", "3", "4", "2", "3", "4", "1",
-            "3", "4", "1", "2", "4", "1", "2", "3",
-            "2", "3", "4", "1", "3", "4", "1", "2",
-            "4", "1", "2", "3", "1", "2", "3", "4"
+                    "1", "2", "3", "4", "2", "3", "4", "1",
+                    "3", "4", "1", "2", "4", "1", "2", "3",
+                    "2", "3", "4", "1", "3", "4", "1", "2",
+                    "4", "1", "2", "3", "1", "2", "3", "4"
             };
 
+            // Write pack lines to pack file
+            Path packFile = TestUtils.writePackFile(this.tempDir, "pack.txt", pack);
+
             // Play a game with this pack
-            runGame(NUM_PLAYERS, pack);
+            runGame(NUM_PLAYERS, packFile);
+
+            // Check the invariants of the simulation, comparing before and after
+            assertGameInvariants(NUM_PLAYERS, pack);
+        }
+
+
+        @DisplayName("Generated pack games end with one winner, 4-card hands, no cards lost")
+        @RepeatedTest(20) // Use a newly generated valid pack file each time
+        void generatedPackGameInvariants() throws IOException {
+            final int NUM_PLAYERS = 4;
+
+            // Generate a random valid pack file
+            Path packFile = TestUtils.generateValidPackFile(this.tempDir, "pack.txt", NUM_PLAYERS);
+
+            // Get the raw pack lines of the pack file
+            String[] pack = readLog("pack.txt");
+
+            // Play a game with this pack
+            runGame(NUM_PLAYERS, packFile);
+
+            // Check the invariants of the simulation, comparing before and after
+            assertGameInvariants(NUM_PLAYERS, pack);
+        }
+
+
+        /**
+         * Check that the internal conditions of the class remains the safe no matter what
+         * e.g. that the number of cards remains the same before and after, and that only one player wins
+         * @param NUM_PLAYERS The number of players, n
+         * @param packLines The raw lines of the packfile containing card values
+         * @throws IOException If a log file fails to be read
+         */
+        void assertGameInvariants(int NUM_PLAYERS, String[] packLines) throws IOException {
+            final int DISCARDED_INDEX_IN_LOGSTRING = 4;
+            final int HAND_CARDS_FROMWORD_INDEX = 5;
 
             // Collect all the cards held by a player or deck at the end of game
             // And compare to cards at start to check total counts match
@@ -384,9 +417,9 @@ public class CardGameTest {
             }
 
             // Check total conservation of cards
-            int[] packValues = new int[pack.length];
-            for (int i = 0; i < pack.length; i++) {
-                packValues[i] = Integer.parseInt(pack[i]);
+            int[] packValues = new int[packLines.length];
+            for (int i = 0; i < packLines.length; i++) {
+                packValues[i] = Integer.parseInt(packLines[i]);
             }
 
             // Sort before and after arrays and check equal
