@@ -142,7 +142,7 @@ class Deck {
             String deckContents = convertDeckContentsToString();
 
             // Write this content to the log file
-            fw.write(String.format("deck %d contents: %s", this.deckValue, deckContents));
+            fw.write(String.format("deck%d contents: %s", this.deckValue, deckContents));
         } catch (IOException e) {
             System.out.printf("ERROR: Failed to write final deck contents to log file \"%s\" for deck%d\n",
                     logFilePath, this.deckValue);
