@@ -217,7 +217,24 @@ public class PackTest {
             assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
         }
 
-            // TODO: packWithNonIntThrows
+        // ========== Tests for Invalid Packs ==========
+        @DisplayName("Negative card values throw")
+        @Test
+        void negativeValueThrows() throws IOException {
+            // Create a guaranteed valid pack file
+            String[] lines = validLines();
+            // Set some card values to be negative
+            lines[31] = "-1";
+            lines[30] = "-10000000";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            assertThrows(InvalidPackFileException.class, () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+        }
+
+        // TODO: packWithNonIntThrows
         // TODO: packWithTrailingNewlineIsValid
         // TODO: missingPackFileThrows
         // TODO: packContainsNegativesThrows
