@@ -90,7 +90,9 @@ public class CardGame {
     }
 
     /**
-     * Sets up and starts a new multithreaded card playing simulation.
+     * Sets up and starts a new multithreaded card playing simulation to completion
+     * <br>
+     * Returns only once every player thread has finished (e.g. player has won and all players exited)
      */
     void startSim() {
         out.println("=== ECM2414 Software Development Coursework ===\nMultithreaded Card Playing Sim");
@@ -149,6 +151,19 @@ public class CardGame {
         // Start all threads (players)
         for (Thread thread : this.threads) {
             thread.start();
+        }
+
+        // Wait for every thread (player) to finish
+        // So startSim() returns once game is finished
+        for (Thread thread : this.threads) {
+            try {
+                // Block until this player's thread has ended
+                thread.join();
+            } catch (InterruptedException e) {
+                // If main thread interrupted while waiting, restore interrupt flag and stop waiting
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
     }
 
