@@ -1,17 +1,13 @@
 package card_playing_sim;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
@@ -82,6 +78,23 @@ public class PlayerTest {
     }
 
     /**
+     * Utility to create a deck holding the given card values (FIFO)
+     * @param deckValue Unique value to assign the deck
+     * @param values Card values to discard to the deck in order
+     * @return The created deck
+     */
+    private Deck createDeckWithCards(int deckValue, int[] values) {
+        // Create a new deck with the assigned value
+        Deck deck = new Deck(deckValue);
+
+        // Sequentially add each card to deck in order
+        for (int value : values) {
+            deck.discardToDeck(new Card(value));
+        }
+        return deck;
+    }
+
+    /**
      * Utility to read every line of player 1's log file
      * @return The String array of all lines in log file
      * @throws IOException If the log file can't be read
@@ -124,6 +137,7 @@ public class PlayerTest {
         @DisplayName("Initial hand is logged correctly")
         @Test
         void initialHandLogFormat() throws IOException {
+            // Create player with simple hand
             Player player = createPlayerWithHand(new int[]{1, 5, 2, 7});
 
             // Log player hand to log file
@@ -133,10 +147,42 @@ public class PlayerTest {
                     "player 1 initial hand 1 5 2 7"
             };
 
+            // Check that initial log hand matches expected format
             assertArrayEquals(expectedLog, readPlayerOneLog());
 
 
         }
+
+        @DisplayName("Loser logs winner, final hand and exit message")
+        @Test
+        void loserLogFormat() throws IOException {
+            // Create player with simple hand
+            Player player = createPlayerWithHand(new int[]{1, 5, 2, 7});
+
+            // Set player's left/right decks empty to prevent discard/draw
+            player.setLeftDeck(createDeckWithCards(1, new int[0]));
+            player.setRightDeck(createDeckWithCards(2, new int[0]));
+
+            // Simulate player 3 winning (ending game)
+            mockGameController.setWinningPlayerValue(3);
+            player.run();
+
+            String[] expectedLog = {
+                    "player 3 has informed player 1 that player 3 has won",
+                    "player 1 exits",
+                    "player 1 hand: 1 5 2 7"
+            };
+
+            // Check that loser logs match expected format
+            assertArrayEquals(expectedLog, readPlayerOneLog());
+
+            // Check that player called that it exited
+            assertTrue(mockGameController.wasPlayerExitedCalled());
+
+
+        }
+
+
     }
 
     @DisplayName("Giving to a player's full hand throws")

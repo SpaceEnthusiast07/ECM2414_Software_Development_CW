@@ -95,6 +95,6 @@ public class MockGameController implements GameController {
 
     @Override
     public void playerExited() {
-        return;
+        this.playerExitedCalled = true;
     }
 }
