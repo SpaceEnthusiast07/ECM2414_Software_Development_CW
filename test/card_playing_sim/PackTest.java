@@ -230,9 +230,36 @@ public class PackTest {
             // Write lines to pack file
             Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
 
-            // Read that packFile using readPackFile and check it does not throw an error
-            assertThrows(InvalidPackFileException.class, () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+            // Read that packFile using readPackFile and check it does throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is the negative value error
+            assertEquals(NEGATIVE_VALUE_ERROR, e.getMessage());
         }
+
+        @DisplayName("Non-integer card values throw")
+        @Test
+        void nonIntegerValueThrows() throws IOException {
+            // Create a guaranteed valid pack file
+            String[] lines = validLines();
+            // Set card value to be noninteger
+            lines[31] = "two";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is the not integer error
+            assertEquals(NOT_INTEGER_ERROR, e.getMessage());
+        }
+
+
 
         // TODO: packWithNonIntThrows
         // TODO: packWithTrailingNewlineIsValid

@@ -124,7 +124,7 @@ class Pack {
 
                 // Ensure card value is non-negative
                 if (cardValue < 0) {
-                    throw new InvalidPackFileException("ERROR: Pack file must be non-negative.");
+                    throw new InvalidPackFileException("ERROR: Pack file must only contain non-negative card values.");
                 }
                 // Increase number of cards tracker
                 numOfCards++;
