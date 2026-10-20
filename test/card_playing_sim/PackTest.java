@@ -45,7 +45,7 @@ public class PackTest {
     }
 
     @Nested
-    class DeckActionTests {
+    class PackActionTests {
         @DisplayName("Adding and taking from pack")
         @Test
         void takeTopCardReturnsCardsInOrderAdded() {
