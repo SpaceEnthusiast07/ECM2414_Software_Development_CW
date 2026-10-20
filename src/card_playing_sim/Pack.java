@@ -125,9 +125,9 @@ class Pack {
             while (sc.hasNext()) {
                 cardValue = sc.nextInt();
 
-                // Ensure card value is positive
-                if (cardValue < 1) {
-                    throw new InvalidPackFileException("ERROR: Pack file must only contain positive card values.");
+                // Ensure card value is non-negative
+                if (cardValue < 0) {
+                    throw new InvalidPackFileException("ERROR: Pack file must be non-negative.");
                 }
                 // If within range of number of players, update card tracker
                 if (cardValue <= numOfPlayers) {
