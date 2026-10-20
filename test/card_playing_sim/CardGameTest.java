@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +32,8 @@ public class CardGameTest {
         private final String PLAYER_NUM_GREATER_THAN_ONE_ERROR = "ERROR: Number of players must be an Integer greater than 1.";
         private final String PLAYER_NUM_NO_INPUT_ERROR = "ERROR: Please enter a number of players.";
         private final String PLEASE_ENTER_PACK_LOCATION_MESSAGE = "Please enter location of pack to load: ";
+        private final String PACK_FILE_NOT_EXIST_ERROR = "ERROR: Pack file does not exist.";
+        private final String PACK_VALUE_NOT_INTEGER_ERROR = "ERROR: At least 1 card value in the provided pack is not an Integer.";
 
         /**
          * Runs the CardGame's user inputs as a mock game using streams instead of console
@@ -63,6 +66,8 @@ public class CardGameTest {
             return outputString.stripLeading().split("\n\n");
         }
 
+
+
         /**
          * Before each test, create a unique temporary directory for files
          * and creates a fresh randomised valid pack file
@@ -84,14 +89,20 @@ public class CardGameTest {
          */
         @AfterEach
         void cleanUpTempDirAndRandPackFile() throws IOException {
-            Files.delete(this.randomValidPackFile);
+            // List all file in the log folder using a stream and delete each one
+            try (Stream<Path> files = Files.list(this.tempDir)) {
+                for (Path file : files.toList()) {
+                    Files.delete(file);
+                }
+            }
             Files.delete(this.tempDir);
 
+            // Force reset paths to null
             this.randomValidPackFile = null;
             this.tempDir = null;
         }
 
-        @DisplayName("Invalid player counts reprompt until valid")
+        @DisplayName("Invalid player counts log error and reprompt until valid")
         @Test
         void invalidPlayerCountReprompt() throws IOException {
             // Create 4 input cases for different scenarios and edge cases for player count prompt
@@ -132,7 +143,7 @@ public class CardGameTest {
             // List the expected outputs for each given input
             String[] expectedOutputs = {
                     PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + "\n" + PLEASE_ENTER_PACK_LOCATION_MESSAGE // Valid input, progress to packfile prompt
-                    // No error response if correct pack file input
+                    // No error response as correct pack file input
             };
 
             // Run the prompts and return the string outputs from PrintStream
@@ -142,9 +153,37 @@ public class CardGameTest {
             assertArrayEquals(expectedOutputs, actualOutputs);
         }
 
-        // TODO: write test
+        @DisplayName("Invalid pack files log error and reprompt until valid")
         @Test
-        void missingPackFileReprompt() {
+        void invalidPackFileReprompt() throws IOException {
+            // Generate a pack file with invalid contents
+            String[] invalidPackLines = {"1", "five", "2", "4"};
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", invalidPackLines);
+
+            // Create input cases for different scenarios and edge cases for pack file prompt
+            // As well as a guaranteed playerNum input and final valid packFile input, to complete readUserInput()
+            String[] inputs = {
+                    Integer.toString(NUM_PLAYERS),          // Valid Input, ends player count prompt
+                    "missingFile",                          // Invalid packFile, doesn't exist
+                    "randomValidPackFile",                  // Invalid packFile, no file extension
+                    invalidPackFile.toString(),             // Invalid packFile, contains non-ints
+                    this.randomValidPackFile.toString()     // Valid packFile, ends the packFile prompt
+            };
+
+            // List the expected outputs for each given input
+            String[] expectedOutputs = {
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + "\n" +
+                        PLEASE_ENTER_PACK_LOCATION_MESSAGE + PACK_FILE_NOT_EXIST_ERROR, // Valid player count (progresses), but missing packFile (errors)
+                    PLEASE_ENTER_PACK_LOCATION_MESSAGE + PACK_FILE_NOT_EXIST_ERROR, // Missing packFile (errors)
+                    PLEASE_ENTER_PACK_LOCATION_MESSAGE + PACK_VALUE_NOT_INTEGER_ERROR, // Invalid packfile (errors)
+                    PLEASE_ENTER_PACK_LOCATION_MESSAGE  // No error response as correct pack file input
+            };
+
+            // Run the prompts and return the string outputs from PrintStream
+            String[] actualOutputs = getOutputs(inputs);
+
+            // Check all values in expected outputs are equal to all values in actual outputs
+            assertArrayEquals(expectedOutputs, actualOutputs);
 
         }
 
