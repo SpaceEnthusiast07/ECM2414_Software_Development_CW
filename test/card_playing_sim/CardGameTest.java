@@ -1,9 +1,6 @@
 package card_playing_sim;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +11,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CardGameTest {
 
+    /**
+     * A set of tests to check the readUserInput() method, by passing a custom byte stream instead of system in/out
+     * Compares line-by-line expected output and actual output for prompts given user inputs
+     */
     @Nested
     class InputPromptTests {
         // Default number of players to use in tests (for consistency)
@@ -90,6 +91,7 @@ public class CardGameTest {
             this.tempDir = null;
         }
 
+        @DisplayName("Invalid player counts reprompt until valid")
         @Test
         void invalidPlayerCountReprompt() throws IOException {
             // Create 4 input cases for different scenarios and edge cases for player count prompt
@@ -118,10 +120,26 @@ public class CardGameTest {
             assertArrayEquals(expectedOutputs, actualOutputs);
         }
 
-        // TODO: write test
+        @DisplayName("Valid inputs immediately succeed without any reprompting")
         @Test
-        void validPlayerCountSucceeds() throws IOException {
+        void validInputsImmediatelySucceed() throws IOException {
+            // Create 2 perfectly valid inputs for both player num and pack file
+            String[] inputs = {
+                    Integer.toString(NUM_PLAYERS),          // Valid Input, ends player count prompt
+                    this.randomValidPackFile.toString()     // Valid packFile, ends the packFile prompt
+            };
 
+            // List the expected outputs for each given input
+            String[] expectedOutputs = {
+                    PLEASE_ENTER_PLAYER_NUMBER_MESSAGE + "\n" + PLEASE_ENTER_PACK_LOCATION_MESSAGE // Valid input, progress to packfile prompt
+                    // No error response if correct pack file input
+            };
+
+            // Run the prompts and return the string outputs from PrintStream
+            String[] actualOutputs = getOutputs(inputs);
+
+            // Check all values in expected outputs are equal to all values in actual outputs
+            assertArrayEquals(expectedOutputs, actualOutputs);
         }
 
         // TODO: write test
