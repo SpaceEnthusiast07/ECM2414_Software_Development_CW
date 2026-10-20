@@ -227,10 +227,10 @@ public class PlayerTest {
         @DisplayName("Player never discards its preferred card value")
         @RepeatedTest(20)
         void neverDiscardsPreferredCard() throws IOException {
-            // Create player 1 who needs just one more 1
+            // Create player 1 with one of their preferred cards
             Player player = createPlayerWithHand(new int[] {1, 2, 3, 4});
 
-            // Put only 1 in left deck so it definitely takes it
+            // Give player 1 card to draw
             Deck leftDeck = createDeckWithCards(1, new int[] {5});
             Deck rightDeck = createDeckWithCards(2, new int[0]);
             player.setLeftDeck(leftDeck);
@@ -250,6 +250,67 @@ public class PlayerTest {
 
             // Check that there should be 0 cards in left deck (1 taken)
             assertFalse(leftDeck.canTakeFromDeck());
+        }
+
+
+        @DisplayName("No move is made when the left deck is empty")
+        @Test
+        void noMoveWhenLeftDeckEmpty() throws IOException {
+            // Create player with simple hand
+            Player player = createPlayerWithHand(new int[] {1, 2, 3, 4});
+
+            // Make an empty left and right deck
+            Deck leftDeck = createDeckWithCards(1, new int[0]);
+            Deck rightDeck = createDeckWithCards(2, new int[0]);
+            player.setLeftDeck(leftDeck);
+            player.setRightDeck(rightDeck);
+
+            // Player can't win, so end the game after 10 checks
+            mockGameController.endGameAfterChecks(10,2);
+            player.run();
+
+            // Player makes no moves, so only has end-game logs
+            String[] expectedLog = {
+                    "player 2 has informed player 1 that player 2 has won",
+                    "player 1 exits",
+                    "player 1 hand: 1 2 3 4"
+            };
+
+            // Check that player has made no moves in 10 checks
+            assertArrayEquals(expectedLog, readPlayerOneLog());
+
+            // Check that no cards exist in right deck (nothing discarded)
+            assertFalse(rightDeck.canTakeFromDeck());
+        }
+
+        @DisplayName("No move is made when the left deck is empty")
+        @Test
+        void noMoveWhenRightDeckFull() throws IOException {
+            // Create player with simple hand
+            Player player = createPlayerWithHand(new int[] {1, 2, 3, 4});
+
+            // Make a full right deck (5 cards) so player can't discard
+            Deck leftDeck = createDeckWithCards(1, new int[] {5});
+            Deck rightDeck = createDeckWithCards(2, new int[] {2, 6, 6, 6, 6});
+            player.setLeftDeck(leftDeck);
+            player.setRightDeck(rightDeck);
+
+            // Player can't win, so end the game after 10 checks
+            mockGameController.endGameAfterChecks(10,2);
+            player.run();
+
+            // Player makes no moves, so only has end-game logs
+            String[] expectedLog = {
+                    "player 2 has informed player 1 that player 2 has won",
+                    "player 1 exits",
+                    "player 1 hand: 1 2 3 4"
+            };
+
+            // Check that player has made no moves in 10 checks
+            assertArrayEquals(expectedLog, readPlayerOneLog());
+
+            // Check that a card exists in left deck (nothing drawn)
+            assertTrue(leftDeck.canTakeFromDeck());
         }
     }
 
