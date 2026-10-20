@@ -111,9 +111,6 @@ class Pack {
         // Declare variable to hold card value
         int cardValue;
 
-        // Tracks the number of cards of each player's preferred value
-        int[] playerCardCountTracker = new int[numOfPlayers];
-
         // Keeps track of the number of cards in the pack file
         int numOfCards = 0;
 
@@ -128,10 +125,6 @@ class Pack {
                 // Ensure card value is non-negative
                 if (cardValue < 0) {
                     throw new InvalidPackFileException("ERROR: Pack file must be non-negative.");
-                }
-                // If within range of number of players, update card tracker
-                if (cardValue <= numOfPlayers) {
-                    playerCardCountTracker[cardValue-1]++;
                 }
                 // Increase number of cards tracker
                 numOfCards++;
@@ -150,13 +143,6 @@ class Pack {
                 throw new InvalidPackFileException("ERROR: Pack file is too short, must contain exactly 8n cards.");
             }
 
-            // Ensure there are at least 4 cards of each player's preference
-            for (int j : playerCardCountTracker) {
-                if (j < 4) {
-                    throw new InvalidPackFileException("ERROR: Pack file must contain at least 4 of each " +
-                            "player's preferred card.");
-                }
-            }
         } catch (FileNotFoundException e) {
             throw new InvalidPackFileException("ERROR: Pack file does not exist.");
         } catch (InputMismatchException e) {
