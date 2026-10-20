@@ -155,17 +155,16 @@ class Player implements Runnable {
 
     /**
      * Determines if this player has won the game.
-     * @return True if this player has won the game, false otherwise.
+     * @return True all player's cards in hand are the same
      */
     boolean isPlayerWon() {
         boolean isWon = true;
-        int cardIndexInHand = 0;
+        int firstValue = this.hand[0].value();
 
-        while (isWon && cardIndexInHand < CardGame.NUM_CARDS_IN_HAND) {
-            if (this.hand[cardIndexInHand].value() != PLAYER_VALUE) {
+        for (int i = 1; i < CardGame.NUM_CARDS_IN_HAND; i++) {
+            if (this.hand[i].value() != firstValue) {
                 isWon = false;
             }
-            cardIndexInHand++;
         }
 
         return isWon;
