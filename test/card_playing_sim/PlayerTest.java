@@ -328,8 +328,4 @@ public class PlayerTest {
         // Give player one too many cards, and check for InvalidOperation error
         assertThrows(InvalidOperationException.class, () -> player.giveCard(card5));
     }
-
-    // TODO: all move checks and after gameOver checks runs out
-    // TODO: SingleMoveThenWin
-    // TODO: parameterised repeated tests of batch runs
 }

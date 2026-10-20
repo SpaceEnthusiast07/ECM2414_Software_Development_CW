@@ -33,18 +33,6 @@ public class DeckTest {
         return createDeckWithCardValues(values, 1);
     }
 
-    // TODO: Consider deleting as low value
-    @DisplayName("TEST: Get deck value")
-    @Test
-    void getCardValue() {
-        // Create an empty deck
-        int myNumber = 1;
-        Deck myDeck = new Deck(myNumber);
-
-        // Call getter and check returned value is 5
-        assertEquals(myNumber, myDeck.getDeckValue());
-    }
-
     @DisplayName("Discarding and taking from deck in FIFO order")
     @Test
     void takeCardsReturnsInOrderDiscarded() {
