@@ -7,8 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PackTest {
     // TODO: Setup BeforeEach and AfterEach temporary log directory
@@ -139,9 +138,9 @@ public class PackTest {
         private String[] validLines() {
             return new String[] {
                     "1", "2", "1", "5", "9", "4", "3", "2",
-                    "2", "1", "3", "5", "4", "7", "8", "4",
+                    "2", "1", "3", "5", "4", "1", "1", "4",
                     "7", "8", "3", "9", "5", "5", "6", "6",
-                    "9", "4", "3", "7", "7", "2", "1", "3"
+                    "2", "4", "3", "3", "7", "7", "9", "3"
             };
         }
 
@@ -162,7 +161,24 @@ public class PackTest {
 
             // After checking all lines inputted, check there are no extra cards left in pack
             assertThrows(InvalidOperationException.class, () -> pack.takeTopCard());
+        }
 
+        @DisplayName("All non-negative card values allowed")
+        @Test
+        void nonNegativeCardValuesAllowed() throws IOException {
+            // Create a guaranteed valid pack file
+            String[] lines = validLines();
+            // Ensure all variants/edge cases of non-negative values exist in file
+            lines[31] = "0";
+            lines[30] = "100000000";
+            lines[29] = "1";
+            lines[28] = "2";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
         }
 
         // TODO: packWithNonIntThrows
