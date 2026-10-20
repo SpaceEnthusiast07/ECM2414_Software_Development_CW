@@ -34,7 +34,7 @@ class TestUtils {
 
         // For the other half of the file, write random card values between 1 and 2n
         int MAX_CARD_VAL = 2*numPlayers;
-        Random rand = new Random();
+        Random rand = new Random(RANDOM_SEED);
         for (int i = 4 * numPlayers; i < 8 * numPlayers; i++) {
             int randomCardVal = rand.nextInt(MAX_CARD_VAL) + 1;
             lines[i] = Integer.toString(randomCardVal);
