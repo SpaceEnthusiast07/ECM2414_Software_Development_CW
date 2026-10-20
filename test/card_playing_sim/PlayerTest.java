@@ -223,6 +223,34 @@ public class PlayerTest {
             // Check that player called that it exited
             assertTrue(mockGameController.wasPlayerExitedCalled());
         }
+
+        @DisplayName("Player never discards its preferred card value")
+        @RepeatedTest(20)
+        void neverDiscardsPreferredCard() throws IOException {
+            // Create player 1 who needs just one more 1
+            Player player = createPlayerWithHand(new int[] {1, 2, 3, 4});
+
+            // Put only 1 in left deck so it definitely takes it
+            Deck leftDeck = createDeckWithCards(1, new int[] {5});
+            Deck rightDeck = createDeckWithCards(2, new int[0]);
+            player.setLeftDeck(leftDeck);
+            player.setRightDeck(rightDeck);
+
+            // Player can't win, so end the game after 10 checks
+            mockGameController.endGameAfterChecks(10,2);
+            player.run();
+
+            // Get the player's log of their current hand and check always 4 cards
+            String playerHandLog = readPlayerOneLog()[2];
+            String[] hand = playerHandLog.replace("player 1 current hand is", "").trim().split(" ");
+            assertEquals(4, hand.length);
+
+            // Check that player never discards 1 (preferred card)
+            assertNotEquals(1, rightDeck.takeFromDeck().value());
+
+            // Check that there should be 0 cards in left deck (1 taken)
+            assertFalse(leftDeck.canTakeFromDeck());
+        }
     }
 
     @DisplayName("Giving to a player's full hand throws")
