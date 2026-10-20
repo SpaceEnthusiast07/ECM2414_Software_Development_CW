@@ -349,8 +349,8 @@ public class PackTest {
         @DisplayName("Missing pack file throws")
         @Test
         void missingFileThrows() throws IOException {
-            // Create a non-existent filePath
-            Path missingPackFile = Paths.get("missing.txt");
+            // Create a non-existent filePath in temporary directory
+            Path missingPackFile = this.tempDir.resolve("missing.txt");
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
