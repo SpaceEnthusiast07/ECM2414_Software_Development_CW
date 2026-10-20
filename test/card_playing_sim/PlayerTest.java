@@ -19,7 +19,7 @@ public class PlayerTest {
     private MockGameController mockGameController;
 
     // Temporary directory where test logfiles are sent to
-    private Path logDir;
+    private Path tempDir;
 
     /**
      * Before each test, create a unique temporary directory for log files
@@ -29,9 +29,9 @@ public class PlayerTest {
     @BeforeEach
     void setUpControllerAndLogDir() throws IOException {
         // Create temporary logfile directory
-        logDir = Files.createTempDirectory("cardgame_test");
+        tempDir = Files.createTempDirectory("cardgame_test");
         // Instantiate a new mock game controller instance
-        mockGameController = new MockGameController(logDir);
+        mockGameController = new MockGameController(tempDir);
     }
 
     /**
@@ -46,13 +46,13 @@ public class PlayerTest {
         mockGameController = null;
 
         // List all file in the log folder using a stream and delete each one
-        try (Stream<Path> files = Files.list(logDir)) {
+        try (Stream<Path> files = Files.list(tempDir)) {
             for (Path file : files.toList()) {
                 Files.delete(file);
             }
         }
         // Then delete the directory itself
-        Files.delete(logDir);
+        Files.delete(tempDir);
     }
 
     /**
@@ -81,30 +81,62 @@ public class PlayerTest {
         return createPlayerWithHand(values, 1);
     }
 
-    // ========= Instant Winning Hands =========
-
-    @DisplayName("Four of the player's preferred value wins")
-    @Test
-    void fourPreferredCardsWin() {
-        Player player = createPlayerWithHand(new int[] {1,1,1,1});
-
-        assertTrue(player.isPlayerWon());
+    /**
+     * Utility to read every line of player 1's log file
+     * @return The String array of all lines in log file
+     * @throws IOException If the log file can't be read
+     */
+    private String[] readPlayerOneLog() throws IOException {
+        // Read all lines of file and covert from String list to Strign array
+        return Files.readAllLines(this.tempDir.resolve("player1_output.txt")).toArray(new String[0]);
     }
 
-    @DisplayName("Four of the player's non-preferred value wins")
-    @Test
-    void fourNonPreferredCardsWin() {
-        Player player = createPlayerWithHand(new int[] {7,7,7,7});
 
-        assertTrue(player.isPlayerWon());
+    @Nested
+    class WinningHandsTests {
+        @DisplayName("Four of the player's preferred value wins")
+        @Test
+        void fourPreferredCardsWin() {
+            Player player = createPlayerWithHand(new int[]{1, 1, 1, 1});
+
+            assertTrue(player.isPlayerWon());
+        }
+
+        @DisplayName("Four of the player's non-preferred value wins")
+        @Test
+        void fourNonPreferredCardsWin() {
+            Player player = createPlayerWithHand(new int[]{7, 7, 7, 7});
+
+            assertTrue(player.isPlayerWon());
+        }
+
+        @DisplayName("Only three of the player's preferred value does not win")
+        @Test
+        void threeOfAKindDoesNotWin() {
+            Player player = createPlayerWithHand(new int[]{1, 1, 1, 5});
+
+            assertFalse(player.isPlayerWon());
+        }
     }
 
-    @DisplayName("Only three of the player's preferred value does not win")
-    @Test
-    void threeOfAKindDoesNotWin() {
-        Player player = createPlayerWithHand(new int[] {1,1,1,5});
+    @Nested
+    class LogFileTests {
+        @DisplayName("Initial hand is logged correctly")
+        @Test
+        void initialHandLogFormat() throws IOException {
+            Player player = createPlayerWithHand(new int[]{1, 5, 2, 7});
 
-        assertFalse(player.isPlayerWon());
+            // Log player hand to log file
+            player.logInitialHand();
+
+            String[] expectedLog = {
+                    "player 1 initial hand 1 5 2 7"
+            };
+
+            assertArrayEquals(expectedLog, readPlayerOneLog());
+
+
+        }
     }
 
     @DisplayName("Giving to a player's full hand throws")
@@ -123,6 +155,8 @@ public class PlayerTest {
     }
 
     // TODO: InstantWIn
+    // TODO: All logging file checks
+    // TODO: all move checks and after gameOver checks runs out
     // TODO: SingleMoveThenWin
     // TODO: parameterised repeated tests of batch runs
 }
