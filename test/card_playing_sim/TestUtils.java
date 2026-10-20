@@ -9,11 +9,12 @@ import java.util.Random;
 class TestUtils {
 
     static Path generateValidPackFile(Path directory, String fileName, int numPlayers) throws IOException {
+        // Create 8n lines (for the packFile)
         String[] lines = new String[8 * numPlayers];
 
         // Writes 4 of each player's values (1,1,1,1, 2,2,2,2, ...., n,n,n,n)
         for (int i = 0; i < 4 * numPlayers; i++) {
-            lines[i] = Integer.toString(i % 4 + 1);
+            lines[i] = Integer.toString(i / 4 + 1);
         }
 
         // For the other half of the file, write random card values between 1 and 2n
