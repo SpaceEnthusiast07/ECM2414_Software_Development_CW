@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -183,6 +184,65 @@ public class CardGameTest {
             assertArrayEquals(expectedOutputs, actualOutputs);
 
         }
+    }
+
+    @Nested
+    @Tag("integration")
+    class CardGameIntegrationTest {
+        // Temporary directory where test logfiles are sent to
+        private Path tempDir;
+
+        /**
+         * Before each test, create a unique temporary directory for log files
+         * @throws IOException If temp directory creation fails
+         */
+        @BeforeEach
+        void setUpTempDir() throws IOException {
+            // Create temporary logfile directory
+            tempDir = Files.createTempDirectory("cardGameIntegrationTests_");
+        }
+
+        /**
+         * After each test, delete every file in the temp directory, before deleting the directory itself
+         * Prevents any test data in log files or game state remaining between tests
+         * @throws IOException If file/directory deletion fails
+         */
+        @AfterEach
+        void cleanUpTempDir() throws IOException {
+            // List all file in the log folder using a stream and delete each one
+            try (Stream<Path> files = Files.list(tempDir)) {
+                for (Path file : files.toList()) {
+                    Files.delete(file);
+                }
+            }
+            // Then delete the directory itself
+            Files.delete(tempDir);
+        }
+
+        /**
+         * Runs a complete game, failing if it takes over 10 seconds
+         * @param numPlayers The number of players, n
+         * @param packLines The pack file lines in order
+         * @throws IOException If the pack file can't be written
+         */
+        private void runGame(int numPlayers, String[] packLines) throws IOException {
+            // Create a pack file with given card value lines
+            Path packFile = TestUtils.writePackFile(this.tempDir, "pack.txt", packLines);
+
+            // Answer the two prompts: number of players and pack file location
+            String input = numPlayers + "\n" + packFile + "\n";
+
+            // Create an input stream and null output stream (ignore output here)
+            InputStream in = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+            PrintStream out = new PrintStream(OutputStream.nullOutputStream());
+
+            // Create a card game simulation
+            CardGame game = new CardGame(in, out, this.tempDir);
+
+            // Run the startSim() and check it completes under 10 seconds
+            assertTimeoutPreemptively(Duration.ofSeconds(10), () -> game.startSim());
+        }
+
     }
 
     // TODO: Integration tests
