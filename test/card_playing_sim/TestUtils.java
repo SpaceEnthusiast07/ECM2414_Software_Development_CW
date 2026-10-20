@@ -6,8 +6,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Random;
 
+/**
+ * Shared helpers for the card game tests, e.g. writing pack files
+ */
 class TestUtils {
 
+    // Fixed seed so generated packs are the same on every run for repeatable tests
+    private static final long RANDOM_SEED = 42;
+
+    /**
+     * Creates a valid pack file of 8n cards: including 4 of each player's preferred value, then
+     * 4n random values between 1 and 2n
+     * @param directory The directory to create the pack file in
+     * @param fileName The name of the pack file to create
+     * @param numPlayers The number of players, n
+     * @return The Path of the created pack file
+     * @throws IOException If the file fails to write
+     */
     static Path generateValidPackFile(Path directory, String fileName, int numPlayers) throws IOException {
         // Create 8n lines (for the packFile)
         String[] lines = new String[8 * numPlayers];
@@ -29,7 +44,16 @@ class TestUtils {
         return writePackFile(directory, fileName, lines);
     }
 
+    /**
+     * Writes a pack file from inputted string lines, one per row
+     * @param directory The directory to create the pack file in
+     * @param fileName The name of the pack file to create
+     * @param lines The array of lines to write to file
+     * @return The Path of the created pack file
+     * @throws IOException If the file fails to write
+     */
     static Path writePackFile(Path directory, String fileName, String[] lines) throws IOException {
+        // Gets full Path resolving directory and fileName
         Path packFile = directory.resolve(fileName);
 
         // Write each line to the pack file, followed by a newline
