@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -231,12 +232,12 @@ public class PackTest {
             lines[30] = "-10000000";
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
                     InvalidPackFileException.class,
-                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+                    () -> Pack.readPackFile(invalidPackFile.toString(), this.NUM_PLAYERS));
 
             // Check that the error thrown is the negative value error
             assertEquals(NEGATIVE_VALUE_ERROR, e.getMessage());
@@ -251,12 +252,12 @@ public class PackTest {
             lines[31] = "two";
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
                     InvalidPackFileException.class,
-                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+                    () -> Pack.readPackFile(invalidPackFile.toString(), this.NUM_PLAYERS));
 
             // Check that the error thrown is the not integer error
             assertEquals(NOT_INTEGER_ERROR, e.getMessage());
@@ -272,12 +273,12 @@ public class PackTest {
             String[] lessLines = Arrays.copyOf(lines, lines.length - 1);
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lessLines);
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lessLines);
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
                     InvalidPackFileException.class,
-                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+                    () -> Pack.readPackFile(invalidPackFile.toString(), this.NUM_PLAYERS));
 
             // Check that the error thrown is too short pack error
             assertEquals(TOO_SHORT_ERROR, e.getMessage());
@@ -294,18 +295,50 @@ public class PackTest {
             extraLines[lines.length] = "3";
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", extraLines);
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", extraLines);
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
                     InvalidPackFileException.class,
-                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+                    () -> Pack.readPackFile(invalidPackFile.toString(), this.NUM_PLAYERS));
 
             // Check that the error thrown is the too long pack error
             assertEquals(TOO_MANY_ERROR, e.getMessage());
         }
 
+        @DisplayName("Empty pack file throws")
+        @Test
+        void emptyFileThrows() throws IOException {
+            // Create an empty string array
+            String[] noLines = new String[0];
 
+            // Write empty array to pack file
+            Path invalidPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", noLines);
+
+            // Read that packFile using readPackFile and check it does throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(invalidPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is the too short pack error
+            // An empty file is just a pack with too few cards (0 < 8n)
+            assertEquals(TOO_SHORT_ERROR, e.getMessage());
+        }
+
+        @DisplayName("Missing pack file throws")
+        @Test
+        void missingFileThrows() throws IOException {
+            // Create a non-existent filePath
+            Path missingPackFile = Paths.get("missing.txt");
+
+            // Read that packFile using readPackFile and check it does throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(missingPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is the too missing packFile error
+            assertEquals(FILE_NOT_EXIST_ERROR, e.getMessage());
+        }
 
 
 
