@@ -25,12 +25,9 @@ public class CardGameTest {
         // Completely fresh valid pack file to use each test
         private Path randomValidPackFile;
 
-        // All print statements used by the program:
-        private final String PROGRAM_TITLE_MESSAGE = "=== ECM2414 Software Development Coursework ===";
-        private final String PROGRAM_SUBTITLE_MESSAGE = "\nMultithreaded Card Playing Sim";
+        // Prompt and Error messages printed during readUserInput();
         private final String PLEASE_ENTER_PLAYER_NUMBER_MESSAGE = "Please enter the number of players: ";
         private final String PLAYER_NUM_GREATER_THAN_ONE_ERROR = "ERROR: Number of players must be an Integer greater than 1.";
-        private final String PLAYER_NUM_NO_INPUT_ERROR = "ERROR: Please enter a number of players.";
         private final String PLEASE_ENTER_PACK_LOCATION_MESSAGE = "Please enter location of pack to load: ";
         private final String PACK_FILE_NOT_EXIST_ERROR = "ERROR: Pack file does not exist.";
         private final String PACK_VALUE_NOT_INTEGER_ERROR = "ERROR: At least 1 card value in the provided pack is not an Integer.";
@@ -38,7 +35,7 @@ public class CardGameTest {
         /**
          * Runs the CardGame's user inputs as a mock game using streams instead of console
          * @param inputs String array of inputs to be streamed, line by line
-         * @return The buffered outputs as a String array from runtime to exception, separated by double newlines "\n\n"
+         * @return The buffered outputs as a String array, one element per prompt, separated by double newlines "\n\n"
          */
         private String[] getOutputs(String[] inputs) {
             String inputString = String.join("\n", inputs) + "\n";
@@ -59,8 +56,8 @@ public class CardGameTest {
             // Now prompts finished, flush the response stream to the buffer
             responses.flush();
 
-            // Get the buffer as a string array (using UTF-8 formatting)
-            String outputString = buffer.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");;
+            // Get the buffer as a string (using UTF-8 formatting)
+            String outputString = buffer.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");
 
             // Split the output into string elements by double newline (and ignore leading newline)
             return outputString.stripLeading().split("\n\n");
@@ -74,7 +71,7 @@ public class CardGameTest {
          * @throws IOException If temp directory or pack file creation fails
          */
         @BeforeEach
-        void setUpTempDirAndRandPackFile() throws IOException {
+        void setUpTempDirAndPackFile() throws IOException {
             this.tempDir = Files.createTempDirectory("inputPromptTests_");
             this.randomValidPackFile = TestUtils.generateValidPackFile(
                     this.tempDir, "randomValidPackFile.txt", this.NUM_PLAYERS);
@@ -88,7 +85,7 @@ public class CardGameTest {
          * @throws IOException If file/directory deletion fails
          */
         @AfterEach
-        void cleanUpTempDirAndRandPackFile() throws IOException {
+        void cleanUpTempDir() throws IOException {
             // List all file in the log folder using a stream and delete each one
             try (Stream<Path> files = Files.list(this.tempDir)) {
                 for (Path file : files.toList()) {
@@ -104,9 +101,9 @@ public class CardGameTest {
 
         @DisplayName("Invalid player counts log error and reprompt until valid")
         @Test
-        void invalidPlayerCountReprompt() throws IOException {
-            // Create 4 input cases for different scenarios and edge cases for player count prompt
-            // As well as 2 guaranteed valid pack file prompts (to complete the readUserInput() method)
+        void invalidPlayerCountReprompt() {
+            // Create 3 invalid input cases for player count prompt, and a guaranteed valid playerNum
+            // and packFile prompts (to complete readUserInput())
             String[] inputs = {
                     "five",  // Invalid Input (not int)
                     "1",     // Invalid Input (not >1)
@@ -133,7 +130,7 @@ public class CardGameTest {
 
         @DisplayName("Valid inputs immediately succeed without any reprompting")
         @Test
-        void validInputsImmediatelySucceed() throws IOException {
+        void validInputsImmediatelySucceed() {
             // Create 2 perfectly valid inputs for both player num and pack file
             String[] inputs = {
                     Integer.toString(NUM_PLAYERS),          // Valid Input, ends player count prompt
@@ -184,12 +181,6 @@ public class CardGameTest {
 
             // Check all values in expected outputs are equal to all values in actual outputs
             assertArrayEquals(expectedOutputs, actualOutputs);
-
-        }
-
-        // TODO: write test
-        @Test
-        void invalidPackContentsReprompt() {
 
         }
     }
