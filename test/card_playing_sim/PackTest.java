@@ -143,6 +143,7 @@ public class PackTest {
                     "2", "4", "3", "3", "7", "7", "9", "3"
             };
         }
+        // ========== Tests for Valid Packs ==========
 
         @DisplayName("Valid pack loads exactly 8n cards in file order")
         @Test
@@ -173,6 +174,24 @@ public class PackTest {
             lines[30] = "100000000";
             lines[29] = "1";
             lines[28] = "2";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+        }
+
+        @DisplayName("Pack with no preferred values is valid (FAQ 5)")
+        @Test
+        void packWithNoPreferredCardsIsValid() throws IOException {
+            // Create lines with no 1,2,3,4
+            String[] lines = {
+                    "7", "7", "5", "5", "9", "9", "8", "5",
+                    "5", "6", "9", "8", "7", "6", "5", "7",
+                    "7", "8", "9", "9", "5", "5", "6", "6",
+                    "9", "8", "5", "5", "7", "7", "9", "4"
+            };
 
             // Write lines to pack file
             Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
