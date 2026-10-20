@@ -145,6 +145,15 @@ public class CardGame {
             this.players[i].logInitialHand();
         }
 
+        // Check for an immediate winning hand before any thread starts
+        // Prevent players from moving if game already over
+        for (int i = 0; i < this.numOfPlayers; i++) {
+            if (this.players[i].isPlayerWon()) {
+                this.playerGameController.declareWinner(i + 1);
+                break;
+            }
+        }
+
         // Set number of players running before any thread starts, so the count can't decrement to 0 early on quick end
         this.numPlayersRunning.set(this.numOfPlayers);
 
