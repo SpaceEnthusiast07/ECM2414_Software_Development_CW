@@ -179,10 +179,50 @@ public class PlayerTest {
             // Check that player called that it exited
             assertTrue(mockGameController.wasPlayerExitedCalled());
 
-
         }
+    }
 
+    @Nested
+    class MakeMoveTests {
 
+        @DisplayName("Single move draws from left, discards non-preferred to right, then wins")
+        @Test
+        void singleMoveThenWin() throws IOException {
+            // Create player 1 who needs just one more 1
+            Player player = createPlayerWithHand(new int[] {1, 1, 1, 5});
+
+            // Put only 1 in left deck so it definitely takes it
+            Deck leftDeck = createDeckWithCards(1, new int[] {1});
+            Deck rightDeck = createDeckWithCards(2, new int[0]);
+            player.setLeftDeck(leftDeck);
+            player.setRightDeck(rightDeck);
+
+            // Simulate run on test thread
+            player.run();
+
+            // Expected logs given the player discards non-preferred, draws 1, and wins
+            String[] expectedLog = {
+                    "player 1 draws a 1 from deck 1",
+                    "player 1 discards a 5 to deck 2",
+                    "player 1 current hand is 1 1 1 1",
+                    "player 1 wins",
+                    "player 1 exits",
+                    "player 1 final hand: 1 1 1 1"
+            };
+
+            // Check that loser logs match expected format
+            assertArrayEquals(expectedLog, readPlayerOneLog());
+
+            // Check that left deck is now empty and right deck has discarded 5
+            assertFalse(leftDeck.canTakeFromDeck());
+            assertEquals(5, rightDeck.takeFromDeck().value());
+
+            // Check that the winning value matches the player number
+            assertEquals(1, mockGameController.getWinningPlayerValue());
+
+            // Check that player called that it exited
+            assertTrue(mockGameController.wasPlayerExitedCalled());
+        }
     }
 
     @DisplayName("Giving to a player's full hand throws")
@@ -200,8 +240,6 @@ public class PlayerTest {
         assertThrows(InvalidOperationException.class, () -> player.giveCard(card5));
     }
 
-    // TODO: InstantWIn
-    // TODO: All logging file checks
     // TODO: all move checks and after gameOver checks runs out
     // TODO: SingleMoveThenWin
     // TODO: parameterised repeated tests of batch runs
