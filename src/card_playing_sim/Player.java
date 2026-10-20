@@ -223,7 +223,7 @@ class Player implements Runnable {
         for (int i = 0; i < CardGame.NUM_CARDS_IN_HAND; i++) {
             thisPlayersHand = thisPlayersHand.concat(this.hand[i].value() + " ");
         }
-        return thisPlayersHand;
+        return thisPlayersHand.trim();
     }
 
     /**

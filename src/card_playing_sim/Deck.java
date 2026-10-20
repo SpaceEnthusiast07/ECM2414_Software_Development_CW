@@ -125,7 +125,7 @@ class Deck {
             indexOfCardToConvert++;
         }
 
-        return thisDecksContents;
+        return thisDecksContents.trim();
     }
 
     /**
