@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -239,7 +240,7 @@ public class CardGameTest {
             // Create a card game simulation
             CardGame game = new CardGame(in, out, this.tempDir);
 
-            // Run the startSim() and check it completes under 10 seconds
+            // Run the startSim() and check it completes under 10 seconds (performance)
             assertTimeoutPreemptively(Duration.ofSeconds(10), () -> game.startSim());
         }
 
@@ -252,6 +253,25 @@ public class CardGameTest {
         private String[] readLog(String fileName) throws IOException {
             // Read all lines of file and covert from String list to String array
             return Files.readAllLines(this.tempDir.resolve(fileName)).toArray(new String[0]);
+        }
+
+        /**
+         * Gets the card values from a log line, starting from a given word
+         * @param line The log line to read card values from
+         * @param fromWord the index of the first card value word
+         * @return The card values from that word to the end of the line
+         */
+        private int[] cardsFrom(String line, int fromWord) {
+            // Split the line into its individual words
+            String[] words = line.split(" ");
+
+            // Every word from fromWord onwards is a card value
+            int[] values = new int[words.length - fromWord];
+            for (int i = fromWord; i < words.length; i++) {
+                values[i - fromWord] = Integer.parseInt(words[i]);
+            }
+
+            return values;
         }
 
         // If there is an immediate win, it should detect this and immediately end game and log only 4 files
@@ -293,22 +313,90 @@ public class CardGameTest {
             assertArrayEquals(deck1ExpectedLog, readLog("deck1_output.txt"));
         }
 
+        @DisplayName("Random games end with one winner, 4-card hands, no cards lost")
+        @RepeatedTest(20) // Use the same pack each time but thread timing and random discards make games different
+        void randomGameInvariants() throws IOException {
+            final int NUM_PLAYERS = 4;
+            final int DISCARDED_INDEX_IN_LOGSTRING = 4;
+            final int HAND_CARDS_FROMWORD_INDEX = 5;
+
+            // 8 of each value 1 to 4 (with no immediate winning hands)
+            String[] pack = {
+            "1", "2", "3", "4", "2", "3", "4", "1",
+            "3", "4", "1", "2", "4", "1", "2", "3",
+            "2", "3", "4", "1", "3", "4", "1", "2",
+            "4", "1", "2", "3", "1", "2", "3", "4"
+            };
+
+            // Play a game with this pack
+            runGame(NUM_PLAYERS, pack);
+
+            // Collect all the cards held by a player or deck at the end of game
+            // And compare to cards at start to check total counts match
+            int[] endCards = new int[8 * NUM_PLAYERS];
+            int numEndCards = 0;
+
+            // Count how many players declared a win in their own log file
+            int numWinners = 0;
+
+            // Check each player's log file
+            for (int playerNum = 1; playerNum <= NUM_PLAYERS; playerNum++) {
+                String[] log = readLog("player" + playerNum + "_output.txt");
+
+                // Check every line this player logged during the game
+                for (String line : log) {
+                    // Count player win logs (validate only 1 winner)
+                    if (line.equals("player " + playerNum + " wins")) {
+                        numWinners++;
+                    }
+
+                    // Check never discarded a preferred card value
+                    if (line.startsWith("player " + playerNum + " discards")) {
+                        int discardedCardVal = Integer.parseInt(
+                                line.split(" ")[DISCARDED_INDEX_IN_LOGSTRING]);
+                        assertNotEquals(playerNum, discardedCardVal);
+                    }
+
+                    // Check there are always 4 cards in hand
+                    if (line.startsWith("player " + playerNum + "current hand is")) {
+                        int handLength = cardsFrom(line, HAND_CARDS_FROMWORD_INDEX).length;
+                        assertEquals(4, handLength);
+                    }
+                }
+
+                // Get the final hand card values (always the last 4 numbers)
+                String finalHandLine = log[log.length - 1];
+                int numWords = finalHandLine.split(" ").length;
+                for (int value : cardsFrom(finalHandLine, numWords - 4)) {
+                    endCards[numEndCards] = value;
+                    numEndCards++;
+                }
+            }
+
+            // Check each deck's log file
+            for (int deck = 1; deck <= NUM_PLAYERS; deck++) {
+                // Deck logs only have 1 line
+                String deckLine = readLog("deck" + deck + "_output.txt")[0];
+                for (int value : cardsFrom(deckLine, 2)) {
+                    endCards[numEndCards] = value;
+                    numEndCards++;
+                }
+            }
+
+            // Check total conservation of cards
+            int[] packValues = new int[pack.length];
+            for (int i = 0; i < pack.length; i++) {
+                packValues[i] = Integer.parseInt(pack[i]);
+            }
+
+            // Sort before and after arrays and check equal
+            Arrays.sort(packValues);
+            Arrays.sort(endCards);
+            assertArrayEquals(packValues, endCards);
+
+            // Check that there is only one recorded winner
+            assertEquals(1, numWinners);
+        }
+
     }
-
-    // TODO: Integration tests
-    // TODO: Deterministic tests of whole system
-    // TODO: handsDealtRoundRobin
-    // TODO: decksFilledRoundRobin
-
-    // TODO: bunch of random repeated tests and analyse output:
-    // TODO: exactly one wins, and all log files show this
-    // TODO: all log files follow spec, always discards then draws, always hand of 4 cards
-    // TODO: No player discards its preferred value
-    // TODO: player doesn't hold onto same card forever
-    // TODO: no cards ever lost or gained (pack file matches final hand sets)
-
-    // TODO: Setup test suite of integration tests and individual unit tests
-
-    // TODO: Performance tests?? eg test completes within a timeout
-
 }
