@@ -1,0 +1,151 @@
+package card_playing_sim;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+
+/**
+ * Holds a fixed amount of {@link Card}s and utilises a queue structure (FIFO) for taking and discarding cards.
+ * <br>
+ *  - To create a new Deck, simply pass in its value to the constructor.
+ * <br>
+ *  - To discard a card to the bottom of the deck, call {@link #discardToDeck(Card newCard)}.
+ * <br>
+ *  - To take the top card, call {@link #takeFromDeck()}, which returns the top card as a {@link Card} object.
+ * <br>
+ *  - To determine this deck's value, call {@link #getDeckValue()}.
+ */
+class Deck {
+    // Array of cards in deck
+    private volatile Card[] cards;
+
+    // Holds this deck's value
+    private final int deckValue;
+
+    // Holds the max number of cards in a deck
+    private static final int MAX_CARDS_IN_DECK = 1 + CardGame.NUM_CARDS_IN_DECK;
+
+    // Points to the next AVAILABLE space in the deck
+    private int back;
+
+    /**
+     * Initialises a new deck with a capacity of 5 cards by default.
+     * @param deckValue A unique positive integer key for this deck
+     */
+    Deck(int deckValue) {
+        this.cards = new Card[MAX_CARDS_IN_DECK];
+        this.deckValue = deckValue;
+    }
+
+    /**
+     * Adds a new card to the bottom (back) of the deck and throws an exception if the deck is full.
+     * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
+     * @param newCard The new Card to add to the deck.
+     * @throws InvalidOperationException When discarding to a full deck.
+     */
+    synchronized void discardToDeck(Card newCard) throws InvalidOperationException {
+        // Check if the deck is full
+        if (this.back == MAX_CARDS_IN_DECK) {
+            throw new InvalidOperationException(String.format("ERROR: Cannot discard to a full deck; occurred on: %s.", Thread.currentThread().getName()));
+        }
+
+        // Add the new card
+        this.cards[this.back] = newCard;
+
+        // Increment the back pointer to point to the next available space
+        this.back++;
+    }
+
+    /**
+     * Determines if you can discard to this deck.
+     * @return True if deck is NOT full, false otherwise.
+     */
+    public boolean canDiscardToDeck() {
+        return this.back < MAX_CARDS_IN_DECK;
+    }
+
+    /**
+     * Removes and returns the card at the top of the deck, and shifts all other cards
+     * in the array one space to the left.
+     * Synchronization is used here to ensure only one thread can manipulate this deck at a time.
+     * @return The card off the top of the deck.
+     * @throws InvalidOperationException When taking from an empty deck.
+     */
+    synchronized Card takeFromDeck() throws InvalidOperationException {
+        // Check if the deck contains a card to remove
+        if (this.back == 0) {
+            throw new InvalidOperationException(String.format("ERROR: Cannot take from an empty deck; occurred on: %s", Thread.currentThread().getName()));
+        }
+
+        // Store the reference to the card to remove
+        Card removedCard = this.cards[0];
+
+        // Shift all other cards left one space in the array
+        int indexOfCardToShift = 1;
+        while(indexOfCardToShift < MAX_CARDS_IN_DECK && this.cards[indexOfCardToShift] != null) {
+            this.cards[indexOfCardToShift-1] = this.cards[indexOfCardToShift];
+            indexOfCardToShift++;
+        }
+        this.cards[indexOfCardToShift-1] = null;
+
+        // Update back pointer to reflect shifted cards
+        this.back--;
+
+        // Return the removed card
+        return removedCard;
+    }
+
+    /**
+     * Determines if you can take a card from the top of this deck.
+     * @return True if deck is NOT empty, false otherwise.
+     */
+    public boolean canTakeFromDeck() {
+        return this.back > 0;
+    }
+
+    /**
+     * Allows the client to retrieve this deck's value.
+     * @return This deck's value as an Integer.
+     */
+    int getDeckValue() {
+        return this.deckValue;
+    }
+
+    /**
+     * Converts this deck's contents to a String so it can be written to this deck's log file.
+     * @return The String representation of this deck's contents.
+     */
+    String convertDeckContentsToString() {
+        String thisDecksContents = "";
+        int indexOfCardToConvert = 0;
+
+        // Only attempt to convert cards that are not null
+        while (indexOfCardToConvert < MAX_CARDS_IN_DECK && this.cards[indexOfCardToConvert] != null) {
+            thisDecksContents = thisDecksContents.concat(this.cards[indexOfCardToConvert].value() + " ");
+            indexOfCardToConvert++;
+        }
+
+        return thisDecksContents.trim();
+    }
+
+    /**
+     * Writes this deck's final contents to its log file at the end of the game.
+     * @param logDirectory The string of the directory path to log to
+     */
+    void logFinalDeckContents(Path logDirectory) {
+        String logFilePath = logDirectory.resolve(
+                String.format("deck%d_output.txt", this.deckValue)).toString();
+
+        // Append flag is false, by default, because we want a fresh deck log file each game
+        try (FileWriter fw = new FileWriter(logFilePath)) {
+            // Convert this deck's contents to a string
+            String deckContents = convertDeckContentsToString();
+
+            // Write this content to the log file
+            fw.write(String.format("deck%d contents: %s", this.deckValue, deckContents).trim());
+        } catch (IOException e) {
+            System.out.printf("ERROR: Failed to write final deck contents to log file \"%s\" for deck%d\n",
+                    logFilePath, this.deckValue);
+        }
+    }
+}
