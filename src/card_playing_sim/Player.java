@@ -71,14 +71,16 @@ class Player implements Runnable {
             // Check whether this player has won
             if (isPlayerWon()) {
                 // Attempt to mark this player as won.
-                // If not first player to declare winner, don't print
-                if (GAME_CONTROLLER.declareWinner(this.PLAYER_VALUE)) {
-                    // Output to the terminal which player has won
-                    System.out.printf("player %d wins\n", this.PLAYER_VALUE);
-                }
+                GAME_CONTROLLER.declareWinner(this.PLAYER_VALUE);
                 break;
             }
             makeMove();
+        }
+
+        // Check if game state accepts player as true winner
+        if (GAME_CONTROLLER.getWinningPlayerValue() == this.PLAYER_VALUE) {
+            // Output to the terminal that this player has won
+            System.out.printf("player %d wins\n", this.PLAYER_VALUE);
         }
 
         // Write to log file this player's hand and which player won
