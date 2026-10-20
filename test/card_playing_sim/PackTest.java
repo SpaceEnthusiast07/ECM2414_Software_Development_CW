@@ -1,6 +1,8 @@
 package card_playing_sim;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -220,6 +222,25 @@ public class PackTest {
             assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
         }
 
+        @DisplayName("Pack files are valid for varying player counts")
+        @ParameterizedTest(name = "n = {0}")    // Custom label for clearer display in test runs
+        @ValueSource(ints = {1, 2, 3, 4, 5, 10, 15, 19})    // Support varying integers of player counts
+        void validPacksForDifferentPlayerCounts(int numPlayers) throws IOException {
+            // Create a guaranteed valid pack file for the variable player count and write to file
+            String fileName = String.format("%s_Player_Pack.txt", numPlayers);
+            Path validPackFile = TestUtils.generateValidPackFile(this.tempDir, fileName, numPlayers);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            Pack pack = assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), numPlayers));
+
+            // Check that exactly 8n cards can be taken
+            for (int i = 0; i < 8 * numPlayers; i++) {
+                assertDoesNotThrow(() -> pack.takeTopCard());
+            }
+            // After checking all lines inputted, check there are no extra cards left in pack
+            assertThrows(InvalidOperationException.class, () -> pack.takeTopCard());
+        }
+
         // ========== Tests for Invalid Packs ==========
 
         @DisplayName("Negative card values throw")
@@ -340,13 +361,5 @@ public class PackTest {
             assertEquals(FILE_NOT_EXIST_ERROR, e.getMessage());
         }
 
-
-
-        // TODO: packWithNonIntThrows
-        // TODO: packWithTrailingNewlineIsValid
-        // TODO: missingPackFileThrows
-        // TODO: packContainsNegativesThrows
-        // TODO: packFileWithLength (parameterised? too short, too long, exactly right)
-        // TODO: packFileWithoutWinningHand
     }
 }
