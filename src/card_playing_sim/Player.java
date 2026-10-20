@@ -78,53 +78,7 @@ class Player implements Runnable {
                 }
                 break;
             }
-            // Checks whether either deck is not locked and if this player can take or discard to is left
-            // and right decks respectively.
-            else if (this.leftDeck.isNotLocked() && this.rightDeck.isNotLocked() &&
-                    this.leftDeck.canTakeFromDeck() && this.rightDeck.canDiscardToDeck()) {
-                // Lock both decks for this player's atomic take-discard operation
-                this.leftDeck.lock();
-                this.rightDeck.lock();
-
-                // Output everything this player does to its own log file
-                // Append flag is true because we want to add more information to the log file rather than overwrite it
-                try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
-                    // Take card from left deck
-                    Card takenCard = this.leftDeck.takeFromDeck();
-
-                    // Write to log file which card this player just took and from which deck
-                    fw.write(String.format("player %d draws a %d from deck %d\n", this.PLAYER_VALUE,
-                            takenCard.value(), this.leftDeck.getDeckValue()));
-
-                    // Choose card to discard
-                    int indexOfCardToDiscard = getRandomDiscardableCardIndex();
-
-                    // Discard chosen card to right deck
-                    this.rightDeck.discardToDeck(this.hand[indexOfCardToDiscard]);
-
-                    // Write to log file which card this player just discarded and to which deck
-                    fw.write(String.format("player %d discards a %d to deck %d\n", this.PLAYER_VALUE,
-                           this.hand[indexOfCardToDiscard].value(), this.rightDeck.getDeckValue()));
-
-                    // Insert taken card into discarded card's location
-                    this.hand[indexOfCardToDiscard] = takenCard;
-
-                    // Convert this player's hand to a string
-                    String thisPlayersHand = convertHandToString();
-
-                    // Write this player's hand to the log file
-                    fw.write(String.format("player %d current hand is %s\n", this.PLAYER_VALUE, thisPlayersHand));
-                } catch (IOException e) {
-                    System.out.printf("ERROR: Failed to write Player %d action to log file \"%s\"",
-                            this.PLAYER_VALUE, this.PLAYER_LOG_FILE_NAME);
-                } catch (InvalidOperationException e) {
-                    System.out.println(e.getMessage());
-                }
-
-                // Unlocking the decks ready for another player to use them
-                this.leftDeck.unlock();
-                this.rightDeck.unlock();
-            }
+            makeMove();
         }
 
         // Write to log file this player's hand and which player won
@@ -132,6 +86,80 @@ class Player implements Runnable {
 
         // Inform main program that this thread has stopped
         GAME_CONTROLLER.playerExited();
+    }
+
+    /**
+     * Draws the top card from the left deck and discards a random non-preferred card to the bottom
+     * of the right deck as one atomic move.
+     * <br>
+     * Both decks are locked for the whole move, to prevent unwanted mid-action change.
+     * Deadlock is prevented by resource ordering: players lock the lower-valued deck first, so despite
+     * the decks being a ring, a circular wait won't occur
+     * <br>
+     * If left deck is empty or right deck is full, no move is made.
+     */
+    private void makeMove() {
+        Deck firstDeck = this.leftDeck;
+        Deck secondDeck = this.rightDeck;
+
+        // To prevent deadlocks, reorder resources (lower-numbered deck first) to stop ring wait
+        if (secondDeck.getDeckValue() < firstDeck.getDeckValue()) {
+            firstDeck = this.rightDeck;
+            secondDeck = this.leftDeck;
+        }
+
+        Card drawnCard;
+        Card discardedCard;
+
+        // Lock first deck and wait until second is locked too before moving
+        synchronized (firstDeck) {
+            synchronized (secondDeck) {
+
+                // Check if unavailable after locking (to prevent unwanted change), return if can't move
+                if (!this.leftDeck.canTakeFromDeck() || !this.rightDeck.canDiscardToDeck()) {
+                    return;
+                }
+
+                // Also check that since securing locks, no one has won (return if so)
+                if (GAME_CONTROLLER.isGameOver()) {
+                    return;
+                }
+
+                // Draw from left deck
+                drawnCard = this.leftDeck.takeFromDeck();
+
+                // Of cards in hand, discard a random non-preferred card
+                int discardIndex = getRandomDiscardableCardIndex();
+                discardedCard = this.hand[discardIndex];
+                this.rightDeck.discardToDeck(discardedCard);
+
+                // Put drawn card in new hand slot
+                this.hand[discardIndex] = drawnCard;
+
+            }
+        }
+        // Log after releasing locks, so don't hold on IO writes
+        logMove(drawnCard, discardedCard);
+    }
+
+    /**
+     * Logs a completed move to this player's log file
+     * @param drawnCard The card drawn from left deck
+     * @param discardedCard The card discarded to the right deck
+     */
+    private void logMove(Card drawnCard, Card discardedCard) {
+        // Append, as the log file already contains this player's earlier actions
+        try (FileWriter fw = new FileWriter(this.PLAYER_LOG_FILE_NAME, true)) {
+            fw.write(String.format("player %d draws a %d from deck %d\n",
+                    this.PLAYER_VALUE, drawnCard.value(), this.leftDeck.getDeckValue()));
+            fw.write(String.format("player %d discards a %d to deck %d\n",
+                    this.PLAYER_VALUE, discardedCard.value(), this.rightDeck.getDeckValue()));
+            fw.write(String.format("player %d current hand is %s\n",
+                    this.PLAYER_VALUE, convertHandToString()));
+        } catch (IOException e) {
+            System.out.printf("ERROR: Failed to log move to \"%s\" for player%d\n",
+                    this.PLAYER_LOG_FILE_NAME, this.PLAYER_VALUE);
+        }
     }
 
     /**
@@ -155,7 +183,7 @@ class Player implements Runnable {
 
     /**
      * Determines if this player has won the game.
-     * @return True all player's cards in hand are the same
+     * @return True if all player's cards in hand are the same
      */
     boolean isPlayerWon() {
         boolean isWon = true;
