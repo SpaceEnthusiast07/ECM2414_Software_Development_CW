@@ -243,6 +243,56 @@ public class CardGameTest {
             assertTimeoutPreemptively(Duration.ofSeconds(10), () -> game.startSim());
         }
 
+        /**
+         * Reads every line of a log file in the temp directory
+         * @param fileName The log file name (e.g. player1_output.txt)
+         * @return The lines of the file in order
+         * @throws IOException If the file fails to be read
+         */
+        private String[] readLog(String fileName) throws IOException {
+            // Read all lines of file and covert from String list to String array
+            return Files.readAllLines(this.tempDir.resolve(fileName)).toArray(new String[0]);
+        }
+
+        // If there is an immediate win, it should detect this and immediately end game and log only 4 files
+        @DisplayName("Immediate win for one winner")
+        @RepeatedTest(20)  // Another player moving first is a timing race, so repeat to catch it
+        void immediateWin() throws IOException {
+
+            // Create a pack where player 2 instantly wins (initial hand 2,2,2,2)
+            String[] pack = {
+                "10", "2", "12", "13", "14", "2", "16", "17",
+                "18", "2", "20", "21", "22", "2", "24", "25",
+                "26", "27", "28", "29", "30", "31", "32", "33",
+                "34", "35", "36", "37", "38", "39", "40", "41"
+            };
+
+            runGame(4, pack);
+
+            String[] expectedWinnerLog = {
+                    "player 2 initial hand 2 2 2 2",
+                    "player 2 wins",
+                    "player 2 exits",
+                    "player 2 final hand: 2 2 2 2"
+            };
+
+            // Check winner logs as expected in correct format
+            assertArrayEquals(expectedWinnerLog, readLog("player2_output.txt"));
+
+            // Check every player ONLY logs 4 lines (no moves)
+            for (int playerNum = 1; playerNum <= 4; playerNum++) {
+                String logFileName = "player" + playerNum + "_output.txt";
+                assertEquals(4, readLog(logFileName).length);
+            }
+
+            String[] deck1ExpectedLog = {
+                    "deck1 contents: 26 30 34 38"
+            };
+
+            // Check deck 1 still holds initial cards (no moves)
+            assertArrayEquals(deck1ExpectedLog, readLog("deck1_output.txt"));
+        }
+
     }
 
     // TODO: Integration tests
