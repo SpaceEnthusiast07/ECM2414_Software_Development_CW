@@ -227,8 +227,14 @@ public class CardGame {
             // Read the user's input and trim whitespace off ends
             packFilePath = sc.nextLine().trim();
 
-            // Read and validate the provided pack file
-            this.pack = Pack.readPackFile(packFilePath, this.numOfPlayers);
+            try {
+                // Read and validate the provided pack file
+                this.pack = Pack.readPackFile(packFilePath, this.numOfPlayers);
+            } catch (InvalidPackFileException e) {
+                // Print the specific error message with the invalid pack file
+                out.println(e.getMessage());
+            }
+
         }
     }
 

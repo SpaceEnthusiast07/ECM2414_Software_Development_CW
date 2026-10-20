@@ -102,8 +102,9 @@ class Pack {
      * @param packFilePath The file path to the pack file to read and validate.
      * @param numOfPlayers The number of players in the card game.
      * @return Parsed pack file as a Pack object.
+     * @throws InvalidPackFileException If the pack is invalid for any above reason
      */
-    static Pack readPackFile(String packFilePath, int numOfPlayers) {
+    static Pack readPackFile(String packFilePath, int numOfPlayers) throws InvalidPackFileException {
         // Create a new File object
         File packFile = new File(packFilePath);
 
@@ -157,18 +158,13 @@ class Pack {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: Pack file does not exist.");
-            return null;
+            throw new InvalidPackFileException("ERROR: Pack file does not exist.");
         } catch (InputMismatchException e) {
-            System.out.println("ERROR: At least 1 card value in the provided pack is not an Integer.");
-            return null;
-        } catch (InvalidPackFileException e) {
-            System.out.println(e.getMessage());
-            return null;
+            throw new InvalidPackFileException("ERROR: At least 1 card value in the provided pack is not an Integer.");
         } catch (NoSuchElementException e) {
-            System.out.println("ERROR: Pack file is empty, must contain exactly 8n cards.");
-            return null;
+            throw new InvalidPackFileException("ERROR: Pack file is empty, must contain exactly 8n cards.");
         }
+        // InvalidPackFileException propagates up
 
         // Now that the pack file is valid, return it
         return pack;
