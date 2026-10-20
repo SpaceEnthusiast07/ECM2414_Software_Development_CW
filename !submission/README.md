@@ -24,3 +24,5 @@ MacOS and Linux. Ensure you are executing these shell scripts from within the un
 ## Executing the Tests
 To compile and run the tests from the cardsTest.zip archive, run `run_tests.bat` on Windows or `run_tests.sh` on MacOS
 and Linux. Ensure you are executing these shell scripts from within the unzipped cardsTest directory.
+
+If you encounter any permission issues, please run `chmod +x ./run_project.sh` or `chmod +x ./run_tests.sh`.
