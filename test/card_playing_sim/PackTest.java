@@ -204,8 +204,10 @@ public class PackTest {
         @DisplayName("Blank lines at end of file are ignored")
         @Test
         void trailingBlankLinesAreValid() throws IOException {
+            // Create a guaranteed valid pack file
             String[] lines = validLines();
 
+            // Copy the lines array and add 2 extra blank lines to the end as new elements
             String[] extraLines = Arrays.copyOf(lines, lines.length + 2);
             extraLines[lines.length] = "";
             extraLines[lines.length + 1] = "";
@@ -218,6 +220,7 @@ public class PackTest {
         }
 
         // ========== Tests for Invalid Packs ==========
+
         @DisplayName("Negative card values throw")
         @Test
         void negativeValueThrows() throws IOException {
@@ -228,7 +231,7 @@ public class PackTest {
             lines[30] = "-10000000";
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
 
             // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
@@ -248,9 +251,9 @@ public class PackTest {
             lines[31] = "two";
 
             // Write lines to pack file
-            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", lines);
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lines);
 
-            // Read that packFile using readPackFile and check it does not throw an error
+            // Read that packFile using readPackFile and check it does throw an error
             InvalidPackFileException e = assertThrows(
                     InvalidPackFileException.class,
                     () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
@@ -258,6 +261,51 @@ public class PackTest {
             // Check that the error thrown is the not integer error
             assertEquals(NOT_INTEGER_ERROR, e.getMessage());
         }
+
+        @DisplayName("Less than 8n cards throws")
+        @Test
+        void tooFewCardsThrows() throws IOException {
+            // Create a guaranteed valid pack file
+            String[] lines = validLines();
+
+            // Copy the lines array and add remove the last line (card)
+            String[] lessLines = Arrays.copyOf(lines, lines.length - 1);
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", lessLines);
+
+            // Read that packFile using readPackFile and check it does throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is too short pack error
+            assertEquals(TOO_SHORT_ERROR, e.getMessage());
+        }
+
+        @DisplayName("More than 8n cards throws")
+        @Test
+        void tooManyCardsThrows() throws IOException {
+            // Create a guaranteed valid pack file
+            String[] lines = validLines();
+
+            // Copy the lines array and add in an extra line (card)
+            String[] extraLines = Arrays.copyOf(lines, lines.length + 1);
+            extraLines[lines.length] = "3";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "invalidPack.txt", extraLines);
+
+            // Read that packFile using readPackFile and check it does throw an error
+            InvalidPackFileException e = assertThrows(
+                    InvalidPackFileException.class,
+                    () -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+
+            // Check that the error thrown is the too long pack error
+            assertEquals(TOO_MANY_ERROR, e.getMessage());
+        }
+
+
 
 
 
