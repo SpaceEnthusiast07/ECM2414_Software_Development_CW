@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -200,7 +201,23 @@ public class PackTest {
             assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
         }
 
-        // TODO: packWithNonIntThrows
+        @DisplayName("Blank lines at end of file are ignored")
+        @Test
+        void trailingBlankLinesAreValid() throws IOException {
+            String[] lines = validLines();
+
+            String[] extraLines = Arrays.copyOf(lines, lines.length + 2);
+            extraLines[lines.length] = "";
+            extraLines[lines.length + 1] = "";
+
+            // Write lines to pack file
+            Path validPackFile = TestUtils.writePackFile(this.tempDir, "validPack.txt", extraLines);
+
+            // Read that packFile using readPackFile and check it does not throw an error
+            assertDoesNotThrow(() -> Pack.readPackFile(validPackFile.toString(), this.NUM_PLAYERS));
+        }
+
+            // TODO: packWithNonIntThrows
         // TODO: packWithTrailingNewlineIsValid
         // TODO: missingPackFileThrows
         // TODO: packContainsNegativesThrows
