@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlayerTest {
@@ -77,6 +79,32 @@ public class PlayerTest {
      */
     private Player createPlayerWithHand(int[] values) {
         return createPlayerWithHand(values, 1);
+    }
+
+    // ========= Instant Winning Hands =========
+
+    @DisplayName("Four of the player's preferred value wins")
+    @Test
+    void fourPreferredCardsWin() {
+        Player player = createPlayerWithHand(new int[] {1,1,1,1});
+
+        assertTrue(player.isPlayerWon());
+    }
+
+    @DisplayName("Four of the player's non-preferred value wins")
+    @Test
+    void fourNonPreferredCardsWin() {
+        Player player = createPlayerWithHand(new int[] {7,7,7,7});
+
+        assertTrue(player.isPlayerWon());
+    }
+
+    @DisplayName("Only three of the player's preferred value does not win")
+    @Test
+    void threeOfAKindDoesNotWin() {
+        Player player = createPlayerWithHand(new int[] {1,1,1,5});
+
+        assertFalse(player.isPlayerWon());
     }
 
     @DisplayName("Giving to a player's full hand throws")
